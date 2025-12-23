@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Run Tracker</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+:root{
+  --bg:#0f0f0f;
+  --text:#ffffff;
+  --card:#1a1a1a;
+  --accent:#00ffcc;
+}
+.light{
+  --bg:#f5f5f5;
+  --text:#111;
+  --card:#ffffff;
+  --accent:#007bff;
+}
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+header{
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+button{
+  background:var(--accent);
+  border:none;
+  padding:10px 14px;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+  margin:5px;
+}
+
+.card{
+  background:var(--card);
+  margin:10px;
+  padding:15px;
+  border-radius:12px;
+}
+
+.stats{
+  display:flex;
+  justify-content:space-between;
+  text-align:center;
+}
+
+.stat{flex:1}
+.stat h2{margin:6px 0}
+
+#map{
+  height:300px;
+  border-radius:12px;
+}
+
+.run-item{
+  border-bottom:1px solid #333;
+  padding:8px 0;
+  font-size:14px;
+}
+
+/* ===== AVATAR WATERMARK ===== */
+.avatar-watermark{
+  position:fixed;
+  bottom:12px;
+  right:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(0,0,0,.55);
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  color:#fff;
+  z-index:9999;
+}
+.avatar-watermark img{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<header>🏃‍♂️ My Run Tracker</header>
+
+<div class="card">
+  <button onclick="toggleTheme()">🌗 Dark / Light</button>
+  <button onclick="startRun()">▶ START</button>
+  <button onclick="stopRun()">⏹ STOP</button>
+</div>
+
+<div class="card stats">
+  <div class="stat">
+    <div>Quãng đường</div>
+    <h2 id="distance">0.00 km</h2>
+  </div>
+  <div class="stat">
+    <div>Thời gian</div>
+    <h2 id="time">00:00</h2>
+  </div>
+  <div class="stat">
+    <div>Pace</div>
+    <h2 id="pace">--</h2>
+  </div>
+  <div class="stat">
+    <div>🔥 Calories</div>
+    <h2 id="calo">0 kcal</h2>
+  </div>
+</div>
+
+<div class="card">
+  <div id="map"></div>
+</div>
+
+<div class="card">
+  <h3>📜 Lịch sử chạy</h3>
+  <div id="history"></div>
+</div>
+
+<!-- AVATAR + BẢN QUYỀN -->
+<div class="avatar-watermark">
+  <img src="avatar.jpg" alt="avatar">
+  <span>© Dao Dang Tung</span>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ===== THEME ===== */
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light"));
+}
+if(localStorage.getItem("theme")==="true"){
+  document.body.classList.add("light");
+}
+
+/* ===== MAP ===== */
+let map=L.map('map').setView([0,0],16);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19
+}).addTo(map);
+let pathLine=L.polyline([],{color:'#00ffcc'}).addTo(map);
+
+/* ===== RUN DATA ===== */
+let watchId=null;
+let coords=[];
+let totalDistance=0;
+let startTime=null;
+let timer=null;
+
+function toRad(v){return v*Math.PI/180;}
+function calcDistance(a,b){
+  const R=6371;
+  const dLat=toRad(b.lat-a.lat);
+  const dLon=toRad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2+
+    Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*
+    Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+
+function startRun(){
+  if(!navigator.geolocation){
+    alert("Thiết bị không hỗ trợ GPS");
+    return;
+  }
+  coords=[];
+  totalDistance=0;
+  pathLine.setLatLngs([]);
+  startTime=Date.now();
+  document.getElementById("distance").innerText="0.00 km";
+  document.getElementById("pace").innerText="--";
+  document.getElementById("calo").innerText="0 kcal";
+
+  timer=setInterval(updateTime,1000);
+
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const latlng={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(coords.length>0){
+      totalDistance+=calcDistance(coords[coords.length-1],latlng);
+    }
+    coords.push(latlng);
+    pathLine.addLatLng(latlng);
+    map.setView(latlng,17);
+
+    document.getElementById("distance").innerText=
+      totalDistance.toFixed(2)+" km";
+
+    updateCalories();
+  },err=>{
+    alert("Không lấy được GPS");
+  },{enableHighAccuracy:true});
+}
+
+function stopRun(){
+  if(watchId){
+    navigator.geolocation.clearWatch(watchId);
+    watchId=null;
+  }
+  clearInterval(timer);
+  saveRun();
+}
+
+function updateTime(){
+  const diff=Math.floor((Date.now()-startTime)/1000);
+  const min=String(Math.floor(diff/60)).padStart(2,'0');
+  const sec=String(diff%60).padStart(2,'0');
+  document.getElementById("time").innerText=min+":"+sec;
+
+  if(totalDistance>0){
+    const pace=(diff/60)/totalDistance;
+    const pMin=Math.floor(pace);
+    const pSec=Math.floor((pace-pMin)*60);
+    document.getElementById("pace").innerText=
+      pMin+":"+String(pSec).padStart(2,'0');
+  }
+}
+
+/* ===== CALORIES ===== */
+function updateCalories(){
+  let kcal=0;
+  const paceText=document.getElementById("pace").innerText;
+  if(paceText!=="--"){
+    const p=parseInt(paceText.split(":")[0]);
+    kcal = p<=9
+      ? totalDistance*75
+      : totalDistance*55;
+  }
+  document.getElementById("calo").innerText=
+    Math.round(kcal)+" kcal";
+}
+
+/* ===== SAVE & HISTORY ===== */
+function saveRun(){
+  if(totalDistance<0.05) return;
+  const data={
+    date:new Date().toLocaleString(),
+    distance:totalDistance.toFixed(2),
+    time:document.getElementById("time").innerText,
+    calories:document.getElementById("calo").innerText
+  };
+  const history=JSON.parse(localStorage.getItem("runs")||"[]");
+  history.unshift(data);
+  localStorage.setItem("runs",JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory(){
+  const box=document.getElementById("history");
+  box.innerHTML="";
+  const history=JSON.parse(localStorage.getItem("runs")||"[]");
+  history.forEach(r=>{
+    const div=document.createElement("div");
+    div.className="run-item";
+    div.innerText=
+      `${r.date} – ${r.distance} km – ${r.time} – 🔥 ${r.calories}`;
+    box.appendChild(div);
+  });
+}
+renderHistory();
+</script>
+
+</body>
+</html>
