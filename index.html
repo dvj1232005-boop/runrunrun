@@ -8,17 +8,18 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
+/* ===== THEME ===== */
 :root{
   --bg:#0f0f0f;
   --text:#ffffff;
   --card:#1a1a1a;
-  --accent:#00ffcc;
+  --accent:#e53935; /* Christmas red */
 }
 .light{
   --bg:#f5f5f5;
   --text:#111;
   --card:#ffffff;
-  --accent:#007bff;
+  --accent:#2e7d32; /* Christmas green */
 }
 
 body{
@@ -30,10 +31,16 @@ body{
 }
 
 header{
-  padding:15px;
+  padding:14px;
   text-align:center;
   font-size:20px;
   font-weight:bold;
+}
+
+.sub{
+  font-size:13px;
+  opacity:.8;
+  margin-bottom:6px;
 }
 
 button{
@@ -95,12 +102,24 @@ button{
   object-fit:cover;
   border:2px solid var(--accent);
 }
+
+/* ===== SNOW ===== */
+@keyframes fall{
+  to{transform:translateY(110vh);}
+}
+.snow{
+  position:fixed;
+  top:-20px;
+  pointer-events:none;
+  animation:fall linear infinite;
+}
 </style>
 </head>
 
 <body>
 
 <header>🏃‍♂️ My Run Tracker</header>
+<div class="sub">🎄 Merry Christmas & Keep Moving</div>
 
 <div class="card">
   <button onclick="toggleTheme()">🌗 Dark / Light</button>
@@ -136,7 +155,7 @@ button{
   <div id="history"></div>
 </div>
 
-<!-- AVATAR + BẢN QUYỀN -->
+<!-- Avatar + watermark -->
 <div class="avatar-watermark">
   <img src="avatar.jpg" alt="avatar">
   <span>© Dao Dang Tung</span>
@@ -159,7 +178,7 @@ let map=L.map('map').setView([0,0],16);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:19
 }).addTo(map);
-let pathLine=L.polyline([],{color:'#00ffcc'}).addTo(map);
+let pathLine=L.polyline([],{color:'var(--accent)'}).addTo(map);
 
 /* ===== RUN DATA ===== */
 let watchId=null;
@@ -179,37 +198,56 @@ function calcDistance(a,b){
   return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
 }
 
+/* ===== SAFARI-SAFE START ===== */
 function startRun(){
   if(!navigator.geolocation){
     alert("Thiết bị không hỗ trợ GPS");
     return;
   }
+
   coords=[];
   totalDistance=0;
   pathLine.setLatLngs([]);
   startTime=Date.now();
+
   document.getElementById("distance").innerText="0.00 km";
+  document.getElementById("time").innerText="00:00";
   document.getElementById("pace").innerText="--";
   document.getElementById("calo").innerText="0 kcal";
 
-  timer=setInterval(updateTime,1000);
+  navigator.geolocation.getCurrentPosition(
+    () => {
+      timer=setInterval(updateTime,1000);
 
-  watchId=navigator.geolocation.watchPosition(pos=>{
-    const latlng={lat:pos.coords.latitude,lng:pos.coords.longitude};
-    if(coords.length>0){
-      totalDistance+=calcDistance(coords[coords.length-1],latlng);
-    }
-    coords.push(latlng);
-    pathLine.addLatLng(latlng);
-    map.setView(latlng,17);
+      watchId=navigator.geolocation.watchPosition(
+        pos=>{
+          const latlng={
+            lat:pos.coords.latitude,
+            lng:pos.coords.longitude
+          };
 
-    document.getElementById("distance").innerText=
-      totalDistance.toFixed(2)+" km";
+          if(coords.length>0){
+            totalDistance+=calcDistance(coords[coords.length-1],latlng);
+          }
 
-    updateCalories();
-  },err=>{
-    alert("Không lấy được GPS");
-  },{enableHighAccuracy:true});
+          coords.push(latlng);
+          pathLine.addLatLng(latlng);
+          map.setView(latlng,17);
+
+          document.getElementById("distance").innerText=
+            totalDistance.toFixed(2)+" km";
+
+          updateCalories();
+        },
+        ()=>alert("Không lấy được GPS. Hãy bật Location cho Safari."),
+        {enableHighAccuracy:true,maximumAge:0,timeout:10000}
+      );
+    },
+    ()=>{
+      alert("Vào: Cài đặt → Safari → Location → Allow");
+    },
+    {enableHighAccuracy:true}
+  );
 }
 
 function stopRun(){
@@ -217,7 +255,10 @@ function stopRun(){
     navigator.geolocation.clearWatch(watchId);
     watchId=null;
   }
-  clearInterval(timer);
+  if(timer){
+    clearInterval(timer);
+    timer=null;
+  }
   saveRun();
 }
 
@@ -239,12 +280,10 @@ function updateTime(){
 /* ===== CALORIES ===== */
 function updateCalories(){
   let kcal=0;
-  const paceText=document.getElementById("pace").innerText;
-  if(paceText!=="--"){
-    const p=parseInt(paceText.split(":")[0]);
-    kcal = p<=9
-      ? totalDistance*75
-      : totalDistance*55;
+  const pace=document.getElementById("pace").innerText;
+  if(pace!=="--"){
+    const p=parseInt(pace.split(":")[0]);
+    kcal=p<=9 ? totalDistance*75 : totalDistance*55;
   }
   document.getElementById("calo").innerText=
     Math.round(kcal)+" kcal";
@@ -278,7 +317,20 @@ function renderHistory(){
   });
 }
 renderHistory();
+
+/* ===== SNOW EFFECT ===== */
+for(let i=0;i<18;i++){
+  const s=document.createElement("div");
+  s.className="snow";
+  s.innerText="❄";
+  s.style.left=Math.random()*100+"vw";
+  s.style.fontSize=10+Math.random()*10+"px";
+  s.style.opacity=Math.random();
+  s.style.animationDuration=5+Math.random()*5+"s";
+  document.body.appendChild(s);
+}
 </script>
 
 </body>
 </html>
+
