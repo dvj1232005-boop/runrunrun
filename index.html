@@ -2,335 +2,301 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <title>My Run Tracker</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<!-- iOS full screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f0f">
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-/* ===== THEME ===== */
 :root{
   --bg:#0f0f0f;
-  --text:#ffffff;
-  --card:#1a1a1a;
-  --accent:#e53935; /* Christmas red */
-}
-.light{
-  --bg:#f5f5f5;
-  --text:#111;
-  --card:#ffffff;
-  --accent:#2e7d32; /* Christmas green */
+  --text:#fff;
+  --accent:#ff5252;
 }
 
-body{
+html,body{
   margin:0;
-  font-family:Arial, sans-serif;
+  padding:0;
+  width:100%;
+  height:100%;
   background:var(--bg);
   color:var(--text);
-  transition:.3s;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  overflow:hidden;
 }
 
-header{
-  padding:14px;
+/* ===== LED FRAME ===== */
+.led-frame{
+  position:fixed;
+  inset:0;
+  padding:3px;
+  background:linear-gradient(120deg,
+    #ff5252,#ff9100,#ffee58,#00e676,
+    #2979ff,#d500f9,#ff5252);
+  background-size:300% 300%;
+  animation:ledMove 8s linear infinite;
+  opacity:.45;
+}
+
+.running .led-frame{opacity:1}
+
+@keyframes ledMove{
+  0%{background-position:0% 50%}
+  100%{background-position:300% 50%}
+}
+
+/* ===== APP ===== */
+.app{
+  position:relative;
+  height:100%;
+  border-radius:18px;
+  overflow:hidden;
+  background:var(--bg);
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+/* ===== AVATAR ===== */
+.avatar{
+  position:absolute;
+  top:12px;
+  right:14px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  z-index:5;
+}
+
+/* ===== STATS ===== */
+.stats{
+  position:relative;
+  z-index:4;
   text-align:center;
-  font-size:20px;
-  font-weight:bold;
+  padding-top:48px;
+}
+
+.distance{
+  font-size:68px;
+  font-weight:900;
+  letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+
+.km{opacity:.6;margin-top:-10px}
+
+.time{
+  font-size:22px;
+  opacity:.8;
+  margin-top:6px;
 }
 
 .sub{
-  font-size:13px;
-  opacity:.8;
-  margin-bottom:6px;
-}
-
-button{
-  background:var(--accent);
-  border:none;
-  padding:10px 14px;
-  border-radius:6px;
-  font-weight:bold;
-  cursor:pointer;
-  margin:5px;
-}
-
-.card{
-  background:var(--card);
-  margin:10px;
-  padding:15px;
-  border-radius:12px;
-}
-
-.stats{
   display:flex;
-  justify-content:space-between;
-  text-align:center;
-}
-
-.stat{flex:1}
-.stat h2{margin:6px 0}
-
-#map{
-  height:300px;
-  border-radius:12px;
-}
-
-.run-item{
-  border-bottom:1px solid #333;
-  padding:8px 0;
+  justify-content:center;
+  gap:22px;
+  margin-top:10px;
   font-size:14px;
 }
 
-/* ===== AVATAR WATERMARK ===== */
-.avatar-watermark{
-  position:fixed;
-  bottom:12px;
-  right:12px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:rgba(0,0,0,.55);
-  padding:6px 10px;
-  border-radius:20px;
-  font-size:12px;
-  color:#fff;
-  z-index:9999;
-}
-.avatar-watermark img{
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid var(--accent);
+.sub strong{
+  display:block;
+  font-size:18px;
 }
 
-/* ===== SNOW ===== */
-@keyframes fall{
-  to{transform:translateY(110vh);}
+/* ===== HEART ===== */
+#hr{
+  animation:heart 1s infinite;
 }
-.snow{
-  position:fixed;
-  top:-20px;
-  pointer-events:none;
-  animation:fall linear infinite;
+@keyframes heart{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+
+/* ===== BUTTON ===== */
+.controls{
+  display:flex;
+  justify-content:center;
+  margin:18px 0;
+}
+
+.run-btn{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  box-shadow:0 14px 32px rgba(255,82,82,.45);
+  transition:.2s;
+}
+
+.run-btn:active{
+  transform:scale(.92);
+}
+
+.running .run-btn{
+  background:#c62828;
+  transform:scale(1.05);
+}
+
+/* ===== MAP ===== */
+#map{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:45vh;
+  z-index:1;
 }
 </style>
 </head>
 
 <body>
 
-<header>🏃‍♂️ My Run Tracker</header>
-<div class="sub">🎄 Merry Christmas & Keep Moving</div>
+<div class="led-frame"></div>
 
-<div class="card">
-  <button onclick="toggleTheme()">🌗 Dark / Light</button>
-  <button onclick="startRun()">▶ START</button>
-  <button onclick="stopRun()">⏹ STOP</button>
-</div>
+<div class="app">
+  <img src="avatar.jpg" class="avatar">
 
-<div class="card stats">
-  <div class="stat">
-    <div>Quãng đường</div>
-    <h2 id="distance">0.00 km</h2>
-  </div>
-  <div class="stat">
-    <div>Thời gian</div>
-    <h2 id="time">00:00</h2>
-  </div>
-  <div class="stat">
-    <div>Pace</div>
-    <h2 id="pace">--</h2>
-  </div>
-  <div class="stat">
-    <div>🔥 Calories</div>
-    <h2 id="calo">0 kcal</h2>
-  </div>
-</div>
+  <div class="stats">
+    <div class="distance" id="distance">0.00</div>
+    <div class="km">km</div>
 
-<div class="card">
+    <div class="time" id="time">00:00</div>
+
+    <div class="sub">
+      <div>Pace<strong id="pace">--</strong></div>
+      <div>❤️ HR<strong id="hr">--</strong></div>
+      <div>🔥 kcal<strong id="calo">0</strong></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="run-btn" onclick="toggleRun()">START</button>
+  </div>
+
   <div id="map"></div>
 </div>
 
-<div class="card">
-  <h3>📜 Lịch sử chạy</h3>
-  <div id="history"></div>
-</div>
-
-<!-- Avatar + watermark -->
-<div class="avatar-watermark">
-  <img src="avatar.jpg" alt="avatar">
-  <span>© Dao Dang Tung</span>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-/* ===== THEME ===== */
-function toggleTheme(){
-  document.body.classList.toggle("light");
-  localStorage.setItem("theme",document.body.classList.contains("light"));
-}
-if(localStorage.getItem("theme")==="true"){
-  document.body.classList.add("light");
-}
+let running=false,watchId=null,startTime=0,timer=null;
+let coords=[],totalDistance=0,lastStep=0;
+const STEP=0.75;
+const AGE=22;
+let lastHR=0;
 
-/* ===== MAP ===== */
-let map=L.map('map').setView([0,0],16);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19
+let map=L.map("map",{zoomControl:false,dragging:false})
+  .setView([0,0],17);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
+  .addTo(map);
+let line=L.polyline([],{
+  color:"#ff5252",
+  weight:6,
+  lineCap:"round"
 }).addTo(map);
-let pathLine=L.polyline([],{color:'var(--accent)'}).addTo(map);
 
-/* ===== RUN DATA ===== */
-let watchId=null;
-let coords=[];
-let totalDistance=0;
-let startTime=null;
-let timer=null;
-
-function toRad(v){return v*Math.PI/180;}
-function calcDistance(a,b){
-  const R=6371;
-  const dLat=toRad(b.lat-a.lat);
-  const dLon=toRad(b.lng-a.lng);
-  const s=Math.sin(dLat/2)**2+
-    Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*
-    Math.sin(dLon/2)**2;
-  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+function toggleRun(){
+  running?stopRun():startRun();
 }
 
-/* ===== SAFARI-SAFE START ===== */
 function startRun(){
-  if(!navigator.geolocation){
-    alert("Thiết bị không hỗ trợ GPS");
-    return;
-  }
-
-  coords=[];
-  totalDistance=0;
-  pathLine.setLatLngs([]);
+  running=true;
+  document.body.classList.add("running");
+  document.querySelector(".run-btn").innerText="STOP";
   startTime=Date.now();
+  totalDistance=0;coords=[];lastStep=0;
+  line.setLatLngs([]);
+  timer=setInterval(updateTime,1000);
 
-  document.getElementById("distance").innerText="0.00 km";
-  document.getElementById("time").innerText="00:00";
-  document.getElementById("pace").innerText="--";
-  document.getElementById("calo").innerText="0 kcal";
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const p={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(coords.length){
+      totalDistance+=dist(coords.at(-1),p);
+    }
+    coords.push(p);
+    line.addLatLng(p);
+    map.setView(p,17);
+    document.getElementById("distance").innerText=
+      totalDistance.toFixed(2);
 
-  navigator.geolocation.getCurrentPosition(
-    () => {
-      timer=setInterval(updateTime,1000);
-
-      watchId=navigator.geolocation.watchPosition(
-        pos=>{
-          const latlng={
-            lat:pos.coords.latitude,
-            lng:pos.coords.longitude
-          };
-
-          if(coords.length>0){
-            totalDistance+=calcDistance(coords[coords.length-1],latlng);
-          }
-
-          coords.push(latlng);
-          pathLine.addLatLng(latlng);
-          map.setView(latlng,17);
-
-          document.getElementById("distance").innerText=
-            totalDistance.toFixed(2)+" km";
-
-          updateCalories();
-        },
-        ()=>alert("Không lấy được GPS. Hãy bật Location cho Safari."),
-        {enableHighAccuracy:true,maximumAge:0,timeout:10000}
-      );
-    },
-    ()=>{
-      alert("Vào: Cài đặt → Safari → Location → Allow");
-    },
-    {enableHighAccuracy:true}
-  );
+    if(totalDistance*1000-lastStep>=STEP){
+      lastStep=totalDistance*1000;
+      pulseLED();
+    }
+  },null,{enableHighAccuracy:true});
 }
 
 function stopRun(){
-  if(watchId){
-    navigator.geolocation.clearWatch(watchId);
-    watchId=null;
-  }
-  if(timer){
-    clearInterval(timer);
-    timer=null;
-  }
-  saveRun();
+  running=false;
+  document.body.classList.remove("running");
+  document.querySelector(".run-btn").innerText="START";
+  navigator.geolocation.clearWatch(watchId);
+  clearInterval(timer);
 }
 
 function updateTime(){
-  const diff=Math.floor((Date.now()-startTime)/1000);
-  const min=String(Math.floor(diff/60)).padStart(2,'0');
-  const sec=String(diff%60).padStart(2,'0');
-  document.getElementById("time").innerText=min+":"+sec;
+  const d=Math.floor((Date.now()-startTime)/1000);
+  const m=String(Math.floor(d/60)).padStart(2,"0");
+  const s=String(d%60).padStart(2,"0");
+  document.getElementById("time").innerText=m+":"+s;
 
   if(totalDistance>0){
-    const pace=(diff/60)/totalDistance;
-    const pMin=Math.floor(pace);
-    const pSec=Math.floor((pace-pMin)*60);
-    document.getElementById("pace").innerText=
-      pMin+":"+String(pSec).padStart(2,'0');
+    const pace=(d/60)/totalDistance;
+    const pm=Math.floor(pace);
+    const ps=String(Math.floor((pace-pm)*60)).padStart(2,"0");
+    document.getElementById("pace").innerText=pm+":"+ps;
+    estimateHR(pm);
+    document.getElementById("calo").innerText=
+      Math.round(totalDistance*(pm<=9?75:55));
   }
 }
 
-/* ===== CALORIES ===== */
-function updateCalories(){
-  let kcal=0;
-  const pace=document.getElementById("pace").innerText;
-  if(pace!=="--"){
-    const p=parseInt(pace.split(":")[0]);
-    kcal=p<=9 ? totalDistance*75 : totalDistance*55;
-  }
-  document.getElementById("calo").innerText=
-    Math.round(kcal)+" kcal";
+function estimateHR(pace){
+  const max=208-0.7*AGE;
+  let inten=.6;
+  if(pace<=11)inten=.65;
+  if(pace<=9)inten=.72;
+  if(pace<=8)inten=.8;
+  let hr=max*inten+(Math.random()*6-3);
+  lastHR+= (hr-lastHR)*.3;
+  document.getElementById("hr").innerText=
+    Math.round(lastHR);
 }
 
-/* ===== SAVE & HISTORY ===== */
-function saveRun(){
-  if(totalDistance<0.05) return;
-  const data={
-    date:new Date().toLocaleString(),
-    distance:totalDistance.toFixed(2),
-    time:document.getElementById("time").innerText,
-    calories:document.getElementById("calo").innerText
-  };
-  const history=JSON.parse(localStorage.getItem("runs")||"[]");
-  history.unshift(data);
-  localStorage.setItem("runs",JSON.stringify(history));
-  renderHistory();
+function pulseLED(){
+  const l=document.querySelector(".led-frame");
+  l.style.filter="brightness(1.8)";
+  setTimeout(()=>l.style.filter="",120);
 }
 
-function renderHistory(){
-  const box=document.getElementById("history");
-  box.innerHTML="";
-  const history=JSON.parse(localStorage.getItem("runs")||"[]");
-  history.forEach(r=>{
-    const div=document.createElement("div");
-    div.className="run-item";
-    div.innerText=
-      `${r.date} – ${r.distance} km – ${r.time} – 🔥 ${r.calories}`;
-    box.appendChild(div);
-  });
-}
-renderHistory();
-
-/* ===== SNOW EFFECT ===== */
-for(let i=0;i<18;i++){
-  const s=document.createElement("div");
-  s.className="snow";
-  s.innerText="❄";
-  s.style.left=Math.random()*100+"vw";
-  s.style.fontSize=10+Math.random()*10+"px";
-  s.style.opacity=Math.random();
-  s.style.animationDuration=5+Math.random()*5+"s";
-  document.body.appendChild(s);
+function dist(a,b){
+  const R=6371;
+  const dLat=(b.lat-a.lat)*Math.PI/180;
+  const dLng=(b.lng-a.lng)*Math.PI/180;
+  const s=Math.sin(dLat/2)**2+
+    Math.cos(a.lat*Math.PI/180)*
+    Math.cos(b.lat*Math.PI/180)*
+    Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
 }
 </script>
 
 </body>
 </html>
-
