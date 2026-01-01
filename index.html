@@ -2,18 +2,15 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
 <title>My Run Tracker</title>
 
-<!-- iOS full screen -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f0f0f">
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 :root{
@@ -22,9 +19,10 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   --accent:#ff5252;
 }
 
+*{box-sizing:border-box}
+
 html,body{
   margin:0;
-  padding:0;
   width:100%;
   height:100%;
   background:var(--bg);
@@ -42,11 +40,11 @@ html,body{
     #ff5252,#ff9100,#ffee58,#00e676,
     #2979ff,#d500f9,#ff5252);
   background-size:300% 300%;
-  animation:ledMove 8s linear infinite;
-  opacity:.45;
+  animation:ledMove 10s linear infinite;
+  opacity:.18;
+  pointer-events:none;
 }
-
-.running .led-frame{opacity:1}
+.running .led-frame{opacity:.9}
 
 @keyframes ledMove{
   0%{background-position:0% 50%}
@@ -59,7 +57,6 @@ html,body{
   height:100%;
   border-radius:18px;
   overflow:hidden;
-  background:var(--bg);
   padding:
     env(safe-area-inset-top)
     env(safe-area-inset-right)
@@ -76,15 +73,16 @@ html,body{
   height:36px;
   border-radius:50%;
   border:2px solid var(--accent);
+  object-fit:cover;
   z-index:5;
 }
 
-/* ===== STATS ===== */
-.stats{
+/* ===== MAIN CONTENT ===== */
+.main{
   position:relative;
-  z-index:4;
+  z-index:3;
   text-align:center;
-  padding-top:48px;
+  padding-top:52px;
 }
 
 .distance{
@@ -92,28 +90,30 @@ html,body{
   font-weight:900;
   letter-spacing:-1px;
   font-variant-numeric:tabular-nums;
-  text-shadow:0 2px 6px rgba(0,0,0,.4);
 }
 
-.km{opacity:.6;margin-top:-10px}
+.km{
+  opacity:.6;
+  margin-top:-10px;
+}
 
 .time{
   font-size:22px;
-  opacity:.8;
+  opacity:.75;
   margin-top:6px;
 }
 
 .sub{
   display:flex;
   justify-content:center;
-  gap:22px;
-  margin-top:10px;
+  gap:26px;
+  margin-top:14px;
   font-size:14px;
 }
-
 .sub strong{
   display:block;
   font-size:18px;
+  margin-top:2px;
 }
 
 /* ===== HEART ===== */
@@ -126,43 +126,65 @@ html,body{
   100%{transform:scale(1)}
 }
 
-/* ===== BUTTON ===== */
+/* ===== START BUTTON ===== */
 .controls{
   display:flex;
   justify-content:center;
-  margin:18px 0;
+  margin:28px 0 46px;
 }
 
 .run-btn{
-  width:90px;
-  height:90px;
+  width:92px;
+  height:92px;
   border-radius:50%;
   border:none;
   background:var(--accent);
   color:#fff;
   font-size:16px;
   font-weight:800;
-  box-shadow:0 14px 32px rgba(255,82,82,.45);
+  box-shadow:0 14px 34px rgba(255,82,82,.45);
   transition:.2s;
 }
-
-.run-btn:active{
-  transform:scale(.92);
-}
-
+.run-btn:active{transform:scale(.92)}
 .running .run-btn{
   background:#c62828;
   transform:scale(1.05);
 }
 
-/* ===== MAP ===== */
-#map{
+/* ===== MAP PREVIEW (FIX CHÍNH) ===== */
+.map-wrap{
   position:absolute;
   bottom:0;
   left:0;
   right:0;
-  height:45vh;
+  height:22vh;               /* ✅ CHỈ PREVIEW */
+  padding:0 14px 14px;
   z-index:1;
+}
+
+#map{
+  width:100%;
+  height:100%;
+  border-radius:16px;
+  overflow:hidden;
+  opacity:.95;
+}
+
+/* fade chuyển nền */
+.map-wrap::before{
+  content:"";
+  position:absolute;
+  top:-50px;
+  left:0;
+  right:0;
+  height:50px;
+  background:linear-gradient(
+    to bottom,
+    var(--bg),
+    rgba(15,15,15,0)
+  );
+  z-index:2;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -174,7 +196,7 @@ html,body{
 <div class="app">
   <img src="avatar.jpg" class="avatar">
 
-  <div class="stats">
+  <div class="main">
     <div class="distance" id="distance">0.00</div>
     <div class="km">km</div>
 
@@ -191,7 +213,9 @@ html,body{
     <button class="run-btn" onclick="toggleRun()">START</button>
   </div>
 
-  <div id="map"></div>
+  <div class="map-wrap">
+    <div id="map"></div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -202,27 +226,39 @@ const STEP=0.75;
 const AGE=22;
 let lastHR=0;
 
-let map=L.map("map",{zoomControl:false,dragging:false})
-  .setView([0,0],17);
+/* MAP */
+const map=L.map("map",{
+  zoomControl:false,
+  dragging:false,
+  scrollWheelZoom:false,
+  doubleClickZoom:false,
+  touchZoom:false
+}).setView([0,0],17);
+
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-  .addTo(map);
-let line=L.polyline([],{
+.addTo(map);
+
+const line=L.polyline([],{
   color:"#ff5252",
   weight:6,
-  lineCap:"round"
+  lineCap:"round",
+  lineJoin:"round"
 }).addTo(map);
 
-function toggleRun(){
-  running?stopRun():startRun();
-}
+/* CONTROL */
+function toggleRun(){ running?stopRun():startRun(); }
 
 function startRun(){
   running=true;
   document.body.classList.add("running");
   document.querySelector(".run-btn").innerText="STOP";
+
   startTime=Date.now();
-  totalDistance=0;coords=[];lastStep=0;
+  totalDistance=0;
+  coords=[];
+  lastStep=0;
   line.setLatLngs([]);
+
   timer=setInterval(updateTime,1000);
 
   watchId=navigator.geolocation.watchPosition(pos=>{
@@ -233,6 +269,7 @@ function startRun(){
     coords.push(p);
     line.addLatLng(p);
     map.setView(p,17);
+
     document.getElementById("distance").innerText=
       totalDistance.toFixed(2);
 
@@ -251,6 +288,7 @@ function stopRun(){
   clearInterval(timer);
 }
 
+/* TIME + STATS */
 function updateTime(){
   const d=Math.floor((Date.now()-startTime)/1000);
   const m=String(Math.floor(d/60)).padStart(2,"0");
@@ -268,24 +306,26 @@ function updateTime(){
   }
 }
 
+/* HR – MƯỢT */
 function estimateHR(pace){
   const max=208-0.7*AGE;
   let inten=.6;
   if(pace<=11)inten=.65;
   if(pace<=9)inten=.72;
   if(pace<=8)inten=.8;
-  let hr=max*inten+(Math.random()*6-3);
-  lastHR+= (hr-lastHR)*.3;
-  document.getElementById("hr").innerText=
-    Math.round(lastHR);
+  const hr=max*inten+(Math.random()*6-3);
+  lastHR+=(hr-lastHR)*0.15;
+  document.getElementById("hr").innerText=Math.round(lastHR);
 }
 
+/* LED */
 function pulseLED(){
   const l=document.querySelector(".led-frame");
-  l.style.filter="brightness(1.8)";
+  l.style.filter="brightness(1.6)";
   setTimeout(()=>l.style.filter="",120);
 }
 
+/* DIST */
 function dist(a,b){
   const R=6371;
   const dLat=(b.lat-a.lat)*Math.PI/180;
@@ -300,3 +340,4 @@ function dist(a,b){
 
 </body>
 </html>
+
