@@ -2,291 +2,367 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>My Run Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Pro Run Tracker</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f0f0f">
+<meta name="theme-color" content="#121212">
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#0f0f0f;
-  --text:#fff;
-  --accent:#ff5252;
+:root {
+  --bg: #121212;
+  --surface: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent-start: #00E676; /* Xanh lá mượt */
+  --accent-stop: #FF3B30;  /* Đỏ cảnh báo */
 }
 
-/* ===== RESET ===== */
-*{box-sizing:border-box}
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-  overflow:hidden;
+/* ===== RESET & TYPOGRAPHY ===== */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: var(--bg); color: var(--text-primary);
+  font-family: 'Inter', -apple-system, sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ===== LED (MƯỢT – LIÊN TỤC) ===== */
-.led-frame{
-  position:fixed;
-  inset:0;
-  padding:3px;
-  pointer-events:none;
-  background:linear-gradient(
-    120deg,
-    #ff5252,#ff9100,#ffee58,
-    #00e676,#2979ff,#d500f9,#ff5252
-  );
-  background-size:400% 400%;
-  animation:ledFlow 10s linear infinite;
-  opacity:.15;
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: env(safe-area-inset-top, 20px) 20px 10px;
 }
-.running .led-frame{opacity:.6}
+.greeting { font-size: 20px; font-weight: 800; }
+.greeting span { color: var(--accent-start); font-size: 14px; display: block; font-weight: 600;}
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--surface); }
 
-@keyframes ledFlow{
-  0%{background-position:0% 50%}
-  100%{background-position:400% 50%}
+/* ===== MAIN STATS (DISTANCE) ===== */
+.main-stat {
+  text-align: center;
+  padding: 20px 0;
+  flex-shrink: 0;
 }
-
-/* ===== APP ===== */
-.app{
-  position:relative;
-  height:100%;
-  padding:
-    env(safe-area-inset-top)
-    env(safe-area-inset-right)
-    env(safe-area-inset-bottom)
-    env(safe-area-inset-left);
+.distance-val {
+  font-size: 80px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -3px;
+  background: linear-gradient(135deg, #fff, #a0a0a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+.distance-unit { font-size: 18px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
 
-/* ===== AVATAR ===== */
-.avatar{
-  position:absolute;
-  top:12px;
-  right:14px;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  border:2px solid var(--accent);
-  object-fit:cover;
-  z-index:5;
+/* ===== STATS GRID (GLASSMORPHISM) ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  z-index: 10;
 }
-
-/* ===== STATS ===== */
-.stats{
-  text-align:center;
-  padding-top:60px;
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px 10px;
+  text-align: center;
 }
+.stat-card .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
+.stat-card .val { font-size: 20px; font-weight: 800; }
 
-.distance{
-  font-size:64px;
-  font-weight:900;
-  letter-spacing:-1px;
+/* ===== MAP AREA ===== */
+.map-container {
+  flex-grow: 1;
+  position: relative;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
 }
-
-.km{opacity:.6;margin-top:-8px}
-
-.time{
-  margin-top:6px;
-  font-size:22px;
-  opacity:.8;
-}
-
-.sub{
-  margin-top:12px;
-  display:flex;
-  justify-content:center;
-  gap:24px;
-  font-size:14px;
-}
-.sub strong{
-  display:block;
-  font-size:18px;
+#map { width: 100%; height: 100%; }
+/* Cú trick CSS để biến map trắng thành Dark Mode */
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
-/* ===== BUTTON ===== */
-.controls{
-  margin:32px 0 40px;
-  display:flex;
-  justify-content:center;
+/* ===== CONTROLS (FLOATING OVER MAP) ===== */
+.controls {
+  position: absolute;
+  bottom: env(safe-area-inset-bottom, 30px);
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none; /* Let map clicks pass through except on button */
+}
+.run-btn {
+  pointer-events: auto;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 6px solid var(--bg);
+  background: var(--accent-start);
+  color: var(--bg);
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.run-btn:active { transform: scale(0.9); }
+.run-btn span { font-size: 12px; font-weight: 600; opacity: 0.8; margin-top: 4px; }
+
+/* Trạng thái đang chạy */
+body.is-running .run-btn {
+  background: var(--accent-stop);
+  box-shadow: 0 10px 30px rgba(255, 59, 48, 0.4);
+  color: white;
+  animation: pulse 2s infinite;
+}
+body.is-running .greeting span { color: var(--accent-stop); }
+body.is-running .greeting span::before {
+  content: "●"; margin-right: 5px; animation: blink 1s infinite;
 }
 
-.run-btn{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  border:none;
-  background:var(--accent);
-  color:#fff;
-  font-size:16px;
-  font-weight:800;
-  box-shadow:0 14px 32px rgba(255,82,82,.45);
-  transition:.2s;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 59, 48, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
 }
-.run-btn:active{transform:scale(.92)}
-.running .run-btn{
-  background:#c62828;
-  transform:scale(1.05);
-}
+@keyframes blink { 50% { opacity: 0; } }
 
-/* ===== MAP PREVIEW (KHÔNG CẮT NỀN) ===== */
-.map-wrap{
-  position:absolute;
-  left:12px;
-  right:12px;
-  bottom:12px;
-  height:22vh;
-  border-radius:16px;
-  overflow:hidden;
-}
-.map-wrap::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:40px;
-  background:linear-gradient(
-    to bottom,
-    var(--bg),
-    transparent
-  );
-  z-index:2;
-}
-#map{
-  width:100%;
-  height:100%;
-}
 </style>
 </head>
 
 <body>
 
-<div class="led-frame"></div>
-
-<div class="app">
-  <img src="avatar.jpg" class="avatar">
-
-  <div class="stats">
-    <div class="distance" id="distance">0.00</div>
-    <div class="km">km</div>
-    <div class="time" id="time">00:00</div>
-
-    <div class="sub">
-      <div>Pace<strong id="pace">--</strong></div>
-      <div>❤️ HR<strong id="hr">--</strong></div>
-      <div>🔥 kcal<strong id="calo">0</strong></div>
-    </div>
+<div class="header">
+  <div class="greeting">
+    Hi, Runner!
+    <span id="status-text">Ready to run</span>
   </div>
+  <!-- Bạn thay link ảnh avatar thật của bạn vào đây -->
+  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Runner" class="avatar" alt="Avatar">
+</div>
 
+<div class="main-stat">
+  <div class="distance-val" id="distance">0.00</div>
+  <div class="distance-unit">Kilometers</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="label">Time</div>
+    <div class="val" id="time">00:00</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Pace</div>
+    <div class="val" id="pace">--'--"</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Kcal</div>
+    <div class="val" id="calo">0</div>
+  </div>
+</div>
+
+<div class="map-container">
+  <div id="map"></div>
+  
   <div class="controls">
-    <button class="run-btn" onclick="toggleRun()">START</button>
-  </div>
-
-  <div class="map-wrap">
-    <div id="map"></div>
+    <button class="run-btn" id="runBtn" onclick="toggleRun()">
+      START
+      <span>Hold to stop</span>
+    </button>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let running=false,watchId=null,startTime=0,timer=null;
-let coords=[],total=0,lastHR=0;
-const AGE=22;
+// ===== TRẠNG THÁI ỨNG DỤNG =====
+let isRunning = false;
+let watchId = null;
+let timerId = null;
+let startTime = 0;
+let totalDistance = 0; // Đơn vị: km
+let coordsPath = [];
+let wakeLock = null; // Quản lý chống tắt màn hình
 
-let map=L.map("map",{
-  zoomControl:false,
-  dragging:false,
-  scrollWheelZoom:false,
-  doubleClickZoom:false,
-  touchZoom:false
-}).setView([0,0],17);
+// ===== KHỞI TẠO BẢN ĐỒ =====
+const map = L.map("map", {
+  zoomControl: false, dragging: true, scrollWheelZoom: false, doubleClickZoom: false
+}).setView([10.762622, 106.660172], 15); // Default: HCM. Sẽ tự update khi có GPS
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-.addTo(map);
-
-let line=L.polyline([],{
-  color:"#ff5252",
-  weight:5,
-  lineCap:"round",
-  opacity:.9
+// Load tile bản đồ (Sử dụng CSS filter ở trên để biến thành dark mode)
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap'
 }).addTo(map);
 
-function toggleRun(){running?stopRun():startRun()}
+// Vẽ đường chạy (Màu xanh neon nổi bật trên nền đen)
+let pathLine = L.polyline([], {
+  color: "#00E676", weight: 6, lineCap: "round", lineJoin: "round", opacity: 0.9
+}).addTo(map);
 
-function startRun(){
-  running=true;
-  document.body.classList.add("running");
-  document.querySelector(".run-btn").innerText="STOP";
-  startTime=Date.now();
-  total=0;coords=[];
-  line.setLatLngs([]);
-  timer=setInterval(updateTime,1000);
+// Cập nhật marker vị trí hiện tại
+let currentMarker = null;
 
-  watchId=navigator.geolocation.watchPosition(p=>{
-    const c={lat:p.coords.latitude,lng:p.coords.longitude};
-    if(coords.length) total+=dist(coords.at(-1),c);
-    coords.push(c);
-    line.addLatLng(c);
-    map.setView(c,17);
-    document.getElementById("distance").innerText=total.toFixed(2);
-  },null,{enableHighAccuracy:true});
-}
-
-function stopRun(){
-  running=false;
-  document.body.classList.remove("running");
-  document.querySelector(".run-btn").innerText="START";
-  navigator.geolocation.clearWatch(watchId);
-  clearInterval(timer);
-}
-
-function updateTime(){
-  const d=Math.floor((Date.now()-startTime)/1000);
-  const m=String(Math.floor(d/60)).padStart(2,"0");
-  const s=String(d%60).padStart(2,"0");
-  document.getElementById("time").innerText=m+":"+s;
-
-  if(total>0){
-    const pace=(d/60)/total;
-    const pm=Math.floor(pace);
-    const ps=String(Math.floor((pace-pm)*60)).padStart(2,"0");
-    document.getElementById("pace").innerText=pm+":"+ps;
-    document.getElementById("calo").innerText=
-      Math.round(total*(pm<=9?75:55));
-    estimateHR(pm);
+// ===== HÀM ĐIỀU KHIỂN WAKE LOCK (CHỐNG TẮT MÀN HÌNH) =====
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Screen Wake Lock is active');
+    }
+  } catch (err) {
+    console.warn(`Wake Lock error: ${err.name}, ${err.message}`);
   }
 }
 
-function estimateHR(pace){
-  const max=208-0.7*AGE;
-  let inten=.6;
-  if(pace<=11)inten=.65;
-  if(pace<=9)inten=.72;
-  if(pace<=8)inten=.8;
-  let hr=max*inten+(Math.random()*6-3);
-  lastHR+=(hr-lastHR)*0.12;
-  document.getElementById("hr").innerText=Math.round(lastHR);
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => { wakeLock = null; });
+  }
 }
 
-function dist(a,b){
-  const R=6371;
-  const dLat=(b.lat-a.lat)*Math.PI/180;
-  const dLng=(b.lng-a.lng)*Math.PI/180;
-  const s=Math.sin(dLat/2)**2+
-    Math.cos(a.lat*Math.PI/180)*
-    Math.cos(b.lat*Math.PI/180)*
-    Math.sin(dLng/2)**2;
-  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+// ===== LOGIC CHÍNH =====
+function toggleRun() {
+  isRunning ? stopRun() : startRun();
 }
+
+function startRun() {
+  isRunning = true;
+  document.body.classList.add("is-running");
+  
+  const btn = document.getElementById("runBtn");
+  btn.innerHTML = `STOP<span>Hold to finish</span>`;
+  document.getElementById("status-text").innerText = "Tracking GPS...";
+
+  requestWakeLock(); // Bật chống tắt màn hình
+
+  startTime = Date.now();
+  totalDistance = 0;
+  coordsPath = [];
+  pathLine.setLatLngs([]);
+  
+  timerId = setInterval(updateUI, 1000);
+
+  // Bắt đầu theo dõi GPS độ chính xác cao
+  watchId = navigator.geolocation.watchPosition(
+    onLocationUpdate,
+    onLocationError,
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+  );
+}
+
+function stopRun() {
+  isRunning = false;
+  document.body.classList.remove("is-running");
+  
+  const btn = document.getElementById("runBtn");
+  btn.innerHTML = `START<span>Tap to resume</span>`;
+  document.getElementById("status-text").innerText = "Paused";
+
+  releaseWakeLock(); // Trả lại quyền tắt màn hình cho điện thoại
+
+  navigator.geolocation.clearWatch(watchId);
+  clearInterval(timerId);
+}
+
+// ===== CẬP NHẬT DỮ LIỆU =====
+function onLocationUpdate(position) {
+  const currentPos = {
+    lat: position.coords.latitude,
+    lng: position.coords.longitude
+  };
+
+  document.getElementById("status-text").innerText = "Recording...";
+
+  // Vẽ marker vị trí hiện tại
+  if (!currentMarker) {
+    currentMarker = L.circleMarker([currentPos.lat, currentPos.lng], {
+      radius: 8, fillColor: "#4285F4", color: "#fff", weight: 3, opacity: 1, fillOpacity: 1
+    }).addTo(map);
+  } else {
+    currentMarker.setLatLng([currentPos.lat, currentPos.lng]);
+  }
+
+  // Tính quãng đường nếu đã có điểm trước đó
+  if (coordsPath.length > 0) {
+    const lastPos = coordsPath[coordsPath.length - 1];
+    const d = calculateDistance(lastPos, currentPos);
+    // Bỏ qua các nhiễu GPS (nếu di chuyển > 100m trong vài giây thì coi như nhiễu)
+    if (d < 0.1) { 
+      totalDistance += d;
+    }
+  }
+
+  coordsPath.push(currentPos);
+  pathLine.addLatLng(currentPos);
+  
+  // Mượt mà trượt camera theo người chạy
+  map.panTo(currentPos, {animate: true, duration: 1});
+  
+  document.getElementById("distance").innerText = totalDistance.toFixed(2);
+}
+
+function onLocationError(err) {
+  console.warn(`GPS Error(${err.code}): ${err.message}`);
+  if(isRunning) {
+    document.getElementById("status-text").innerText = "Weak GPS signal...";
+  }
+}
+
+function updateUI() {
+  // Cập nhật thời gian
+  const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+  const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, "0");
+  const s = String(elapsedSeconds % 60).padStart(2, "0");
+  document.getElementById("time").innerText = `${m}:${s}`;
+
+  // Cập nhật Pace & Calories (Chỉ tính khi có di chuyển)
+  if (totalDistance > 0.01) {
+    // Pace: phút/km
+    const paceVal = (elapsedSeconds / 60) / totalDistance;
+    if (paceVal < 60) { // Giới hạn pace hợp lý
+      const pm = Math.floor(paceVal);
+      const ps = String(Math.floor((paceVal - pm) * 60)).padStart(2, "0");
+      document.getElementById("pace").innerText = `${pm}'${ps}"`;
+      
+      // Calo (ước tính cơ bản: 60 kcal/km cho người tb)
+      document.getElementById("calo").innerText = Math.round(totalDistance * 60);
+    }
+  }
+}
+
+// ===== TOÁN HỌC (Công thức Haversine) =====
+function calculateDistance(a, b) {
+  const R = 6371; // Bán kính Trái Đất (km)
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  return R * c;
+}
+
+// Xin quyền GPS ban đầu để map focus về đúng chỗ trước khi chạy
+navigator.geolocation.getCurrentPosition(
+  pos => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
+  err => console.log("Waiting for GPS permission")
+);
 </script>
 </body>
 </html>
-
