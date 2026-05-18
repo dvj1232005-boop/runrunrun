@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DangTung Mod Menu</title>
+    <title>DangTung Mod Menu Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* CSS Reset & Cơ bản */
+        /* ================= RESET & CƠ BẢN ================= */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            user-select: none;
         }
         
         body {
-            background-color: #000; /* Nền ngoài đen để làm nổi bật menu */
+            background-color: #000; /* Nền giả lập màn hình tối */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,230 +24,256 @@
             color: #fff;
         }
 
-        /* Container Menu Chính */
+        /* ================= CONTAINER CHÍNH ================= */
         .menu-container {
-            width: 850px;
-            height: 480px;
-            background-color: #1c1d21;
-            border-radius: 20px;
+            width: 900px;
+            height: 500px;
+            background: #18191d;
+            border-radius: 24px;
             display: flex;
             position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
-            border: 1px solid #2a2b30;
         }
 
-        /* Nút Tắt (X) */
+        /* Nút X Đóng Menu */
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 35px;
-            height: 35px;
-            background-color: #24252a;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background-color: transparent;
             border: 2px solid #ff4a4a;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #ff4a4a;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 700;
             cursor: pointer;
-            z-index: 10;
-            transition: 0.2s;
+            z-index: 100;
+            transition: all 0.2s ease;
         }
-        .close-btn:hover { background-color: #ff4a4a; color: #fff; }
+        .close-btn:hover {
+            background-color: #ff4a4a;
+            color: #18191d;
+            box-shadow: 0 0 10px rgba(255, 74, 74, 0.5);
+        }
 
-        /* --- Cột Trái (Sidebar) --- */
+        /* ================= SIDEBAR (CỘT TRÁI) ================= */
         .sidebar {
-            width: 260px;
-            background-color: #1c1d21;
-            padding: 20px 15px;
+            width: 270px;
+            background: #18191d;
+            padding: 25px 20px;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            border-right: 1px solid #2a2b30;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Logo DangTung */
-        .logo-section { display: flex; align-items: center; margin-bottom: 25px; padding-left: 5px;}
+        /* Logo Area */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
         .version-box {
             border: 2px solid #1a73e8;
-            border-radius: 12px;
-            padding: 8px 12px;
-            font-size: 22px;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 18px;
             font-weight: 900;
             margin-right: 12px;
             color: #fff;
+            box-shadow: 0 0 10px rgba(26, 115, 232, 0.3);
         }
         .logo-text { display: flex; flex-direction: column; }
-        .logo-title { font-size: 18px; font-weight: 900; letter-spacing: 1px; line-height: 1.1;}
-        .logo-subtitle { font-size: 9px; color: #aaa; text-transform: uppercase; margin-top: 2px;}
+        .logo-title { font-size: 18px; font-weight: 900; letter-spacing: 1px; }
+        .logo-subtitle { font-size: 9px; color: #888; text-transform: uppercase; margin-top: 2px; font-weight: 700;}
 
-        /* Menu Cột Trái */
-        .nav-group { margin-bottom: 15px; }
+        /* Menu Items */
+        .nav-group { margin-bottom: 20px; }
         .nav-title {
-            display: flex;
-            gap: 10px;
             font-size: 10px;
             color: #fff;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-weight: 800;
+            margin-bottom: 10px;
             padding-left: 5px;
+            letter-spacing: 0.5px;
         }
-        .nav-title span.sub { color: #666; font-weight: normal;}
+        .nav-title span.sub { color: #666; font-weight: 600; margin-left: 5px;}
         
         .nav-btn {
-            background-color: #2c2e35;
+            background-color: #26282f;
             border: none;
-            color: #9aa0a6;
-            padding: 12px 15px;
+            color: #8c92a0;
+            padding: 14px 15px;
             border-radius: 12px;
             text-align: center;
-            font-size: 13px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: 800;
             cursor: pointer;
             margin-bottom: 8px;
             width: 100%;
-            transition: 0.2s;
-            text-transform: uppercase;
+            transition: all 0.2s;
         }
         .nav-btn.active {
             background-color: #1a73e8;
             color: #fff;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
         }
-        .nav-btn:hover:not(.active) { background-color: #383a42; color: #fff;}
+        .nav-btn:hover:not(.active) {
+            background-color: #32353e;
+            color: #fff;
+        }
         .nav-row { display: flex; gap: 8px; }
         .nav-row .nav-btn { flex: 1; }
 
-        /* Ẩn thanh cuộn của sidebar */
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        /* --- Phần Nội Dung Chính (Phải) --- */
+        /* ================= MAIN CONTENT (BÊN PHẢI) ================= */
         .main-content {
             flex: 1;
-            padding: 20px 35px;
+            padding: 25px 35px;
             display: flex;
             flex-direction: column;
+            background: #18191d;
         }
         
         .page-title {
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            margin-top: 5px;
+            margin-bottom: 35px;
             letter-spacing: 1px;
+            color: #fff;
         }
 
-        /* Khung Section (Viền màu) */
+        /* Group Borders (Viền màu Neon) */
         .section {
-            border-radius: 16px;
-            padding: 22px 20px 20px 20px;
+            border-radius: 18px;
+            padding: 25px 20px 20px 20px;
             margin-bottom: 25px;
             position: relative;
+            background: transparent;
         }
         .section-title {
             position: absolute;
             top: -10px;
-            left: 20px;
-            background-color: #1c1d21;
-            padding: 0 12px;
+            left: 25px;
+            background-color: #18191d; /* Trùng màu nền để cắt viền */
+            padding: 0 10px;
             font-size: 13px;
             font-weight: 900;
-            text-transform: uppercase;
         }
         
-        /* Màu viền từng Section */
-        .section.green { border: 2px solid #00e676; }
-        .section.green .section-title { color: #00e676; }
+        /* Màu Neon từng khối */
+        .section.green { border: 2px solid #00ff88; }
+        .section.green .section-title { color: #00ff88; }
         
-        .section.orange { border: 2px solid #ff9800; }
-        .section.orange .section-title { color: #ff9800; }
+        .section.orange { border: 2px solid #ff9900; }
+        .section.orange .section-title { color: #ff9900; }
         
-        .section.blue { border: 2px solid #2196f3; }
-        .section.blue .section-title { color: #2196f3; }
+        .section.blue { border: 2px solid #00ccff; }
+        .section.blue .section-title { color: #00ccff; }
 
-        /* Các Nút Điều Khiển Bên Trong */
+        /* ================= CÁC ELEMENT BÊN TRONG ================= */
         .control-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            gap: 12px;
+            margin-bottom: 15px;
+            gap: 15px;
         }
 
+        /* Checkbox Tùy chỉnh */
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background-color: #33363f;
-            padding: 10px 15px;
-            border-radius: 12px;
+            gap: 12px;
+            background-color: #26282f;
+            padding: 12px 15px;
+            border-radius: 14px;
             flex: 1;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .checkbox-item:hover { background-color: #2c2e36; }
+        
         .check-icon {
-            width: 22px;
-            height: 22px;
-            background-color: #5f6368;
+            width: 24px;
+            height: 24px;
+            background-color: #4a4d57;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #fff;
-            font-size: 12px;
+            color: transparent;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
         }
-        .checkbox-item.checked .check-icon { background-color: #1a73e8; }
+        .checkbox-item.checked .check-icon {
+            background-color: #fff;
+            color: #18191d;
+        }
         
         .check-info { display: flex; flex-direction: column; }
-        .check-title { font-weight: 900; font-size: 13px; }
-        .check-desc { font-size: 10px; color: #9aa0a6; margin-top: 2px;}
+        .check-title { font-weight: 800; font-size: 13px; color: #fff;}
+        .check-desc { font-size: 10px; color: #8c92a0; margin-top: 3px; font-weight: 600;}
 
-        /* Banner Mở Khoá Skin */
+        /* Banner Mở Khoá Skin (Mô phỏng hình ảnh xịn xò) */
         .banner {
-            width: 170px;
-            height: 55px;
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            border-radius: 12px;
+            width: 160px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff3366, #ff9933);
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 14px;
-            text-align: center;
-            line-height: 1.2;
+            color: #fff;
             cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        .banner-sub { font-size: 8px; font-weight: normal; margin-top: 3px; }
+        /* Hiệu ứng bóng bẩy cho banner */
+        .banner::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .banner:hover::before { left: 150%; }
+        
+        .banner-title { font-weight: 900; font-size: 13px; z-index: 2;}
+        .banner-sub { font-size: 7px; font-weight: 700; margin-top: 4px; z-index: 2; opacity: 0.9;}
 
-        /* Dropdown */
+        /* Dropdown (Khung Chọn) */
         .dropdown-wrapper { position: relative; width: 100%; }
         .dropdown {
             width: 100%;
-            background-color: #2c2e35;
+            background-color: #26282f;
             border: none;
             color: #fff;
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border-radius: 14px;
             font-size: 13px;
-            font-weight: 900;
+            font-weight: 800;
             appearance: none;
             outline: none;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .dropdown:hover { background-color: #2c2e36; }
         .dropdown-wrapper::after {
-            content: "▼";
+            content: "﹀";
             position: absolute;
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 12px;
-            color: #666;
+            font-size: 14px;
+            color: #8c92a0;
             pointer-events: none;
+            font-weight: bold;
         }
 
         /* Toggle & Điều Chỉnh Camera */
@@ -256,15 +284,15 @@
             padding: 0 10px;
         }
         
+        /* Công tắc (Toggle Switch) giống iOS */
         .toggle-switch {
-            width: 55px;
-            height: 28px;
+            width: 50px;
+            height: 26px;
             background-color: #1a73e8;
-            border-radius: 15px;
+            border-radius: 20px;
             position: relative;
             cursor: pointer;
-            display: flex;
-            align-items: center;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
         }
         .toggle-circle {
             width: 20px;
@@ -272,32 +300,37 @@
             background-color: #fff;
             border-radius: 50%;
             position: absolute;
+            top: 3px;
             right: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .camera-text {
             font-size: 11px;
-            color: #9aa0a6;
+            color: #8c92a0;
             display: flex;
             align-items: center;
             gap: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-weight: 800;
         }
-        .camera-val { font-size: 24px; color: #fff; font-weight: 900; line-height: 1;}
+        .camera-val { font-size: 26px; color: #fff; font-weight: 900; line-height: 1;}
 
+        /* Nút Khoá Cam */
         .btn-action {
-            background-color: #2c2e35;
+            background-color: #26282f;
             border: none;
-            color: #9aa0a6;
-            padding: 12px 25px;
+            color: #8c92a0;
+            padding: 12px 30px;
             border-radius: 12px;
-            font-weight: 900;
+            font-weight: 800;
             font-size: 12px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s;
         }
-        .btn-action:hover { background-color: #383a42; color: #fff; }
+        .btn-action:hover {
+            background-color: #32353e;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -361,7 +394,7 @@
                         </div>
                     </div>
                     <div class="banner">
-                        UNLOCK FULL SKIN
+                        <span class="banner-title">UNLOCK FULL SKIN</span>
                         <span class="banner-sub">NHẤN GIỮ ĐỂ XEM THÊM TUỲ CHỌN</span>
                     </div>
                 </div>
