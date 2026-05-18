@@ -3,348 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DangTung Pro Mod Menu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>DangTung Mod Menu</title>
     <style>
-        /* ================= BIẾN CSS CHUẨN UX/UI ================= */
-        :root {
-            --bg-body: #0a0b10;
-            --bg-menu: rgba(22, 24, 31, 0.85);
-            --bg-sidebar: rgba(18, 19, 25, 0.6);
-            --bg-surface: rgba(255, 255, 255, 0.03);
-            --bg-surface-hover: rgba(255, 255, 255, 0.08);
-            
-            --border-light: rgba(255, 255, 255, 0.06);
-            --border-glow: rgba(255, 255, 255, 0.15);
-            
-            --text-main: #ffffff;
-            --text-dim: #8b92a5;
-            --text-muted: #5e6475;
-            
-            --color-primary: #2563eb;
-            --color-primary-glow: rgba(37, 99, 235, 0.4);
-            --color-green: #10b981;
-            --color-orange: #f59e0b;
-            --color-blue: #0ea5e9;
-            --color-red: #ef4444;
-            
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --radius-xl: 24px;
-            
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Reset & Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif; /* Font cơ bản, cứng cáp giống game */
+            user-select: none;
         }
 
-        /* ================= RESET ================= */
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: radial-gradient(circle at center, #1a1c23 0%, var(--bg-body) 100%);
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-            color: var(--text-main); overflow: hidden;
+            background-color: #000; /* Nền đen giả lập game */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Hình nền giả lập ingame */
-        .ingame-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 8px);
-            z-index: -1; opacity: 0.5;
+        /* Ảnh Avatar Của Bạn (Góc trên bên phải giống màn hình game) */
+        .my-avatar {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #333;
+            z-index: 1;
         }
 
-        /* ================= CONTAINER KÍNH MỜ (GLASSMORPHISM) ================= */
-        .menu-wrapper {
-            width: 920px; height: 540px;
-            background: var(--bg-menu);
-            backdrop-filter: blur(20px) saturate(150%);
-            -webkit-backdrop-filter: blur(20px) saturate(150%);
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--border-light);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 2px 15px rgba(255, 255, 255, 0.05);
-            display: flex; position: relative;
-            animation: menuEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            opacity: 0; transform: scale(0.95) translateY(10px);
+        /* Container Menu Chính */
+        .menu-container {
+            width: 800px;
+            height: 460px;
+            background-color: #1a1a1c; /* Màu xám đen nhám chuẩn mẫu */
+            border-radius: 20px;
+            display: flex;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        @keyframes menuEntry { to { opacity: 1; transform: scale(1) translateY(0); } }
 
-        /* Nút Tắt */
+        /* Nút X màu đỏ */
         .close-btn {
-            position: absolute; top: 20px; right: 24px;
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--bg-surface); border: 1px solid var(--border-light);
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: var(--transition); z-index: 10; color: var(--text-dim);
-        }
-        .close-btn:hover {
-            background: rgba(239, 68, 68, 0.1); border-color: var(--color-red); color: var(--color-red);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); transform: rotate(90deg);
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            background-color: #1a1a1c;
+            border: 2px solid #ff4d4d;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff4d4d;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 20;
         }
 
-        /* ================= SIDEBAR ================= */
+        /* --- Cột Trái (Sidebar) --- */
         .sidebar {
-            width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border-light);
-            padding: 30px 24px; display: flex; flex-direction: column; overflow-y: auto;
+            width: 240px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
         }
-        .sidebar::-webkit-scrollbar { width: 0; }
 
-        .logo-box { display: flex; align-items: center; margin-bottom: 40px; }
-        .version-badge {
-            background: linear-gradient(135deg, var(--color-primary), #3b82f6);
-            padding: 8px 12px; border-radius: var(--radius-sm);
-            font-size: 16px; font-weight: 800; color: #fff; margin-right: 14px;
-            box-shadow: 0 8px 16px var(--color-primary-glow);
+        /* Logo DANGTUNG */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
         }
-        .logo-text h1 { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; line-height: 1.1; }
-        .logo-text span { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-
-        .nav-section { margin-bottom: 24px; }
-        .nav-label { font-size: 10px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; justify-content: space-between;}
-        .nav-label span.sub { color: var(--text-muted); font-weight: 600; }
-
-        .nav-item {
-            width: 100%; background: transparent; border: 1px solid transparent; color: var(--text-dim);
-            padding: 14px 16px; border-radius: var(--radius-md); font-size: 13px; font-weight: 700;
-            text-align: left; cursor: pointer; transition: var(--transition); margin-bottom: 8px;
-            display: flex; align-items: center; gap: 10px;
+        .version {
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 20px;
+            font-weight: 900;
+            margin-right: 10px;
+            color: #fff;
         }
-        .nav-item::before {
-            content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); transition: var(--transition);
+        .brand { display: flex; flex-direction: column; }
+        .brand-title { 
+            font-size: 16px; 
+            font-weight: 900; 
+            line-height: 1.1;
+            letter-spacing: 0.5px;
         }
-        .nav-item:hover { background: var(--bg-surface); color: var(--text-main); transform: translateX(4px); }
-        .nav-item.active {
-            background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3); color: var(--text-main);
+        .brand-sub { 
+            font-size: 8px; 
+            color: #8e8e93; 
+            margin-top: 2px;
+            font-weight: bold;
         }
-        .nav-item.active::before { background: var(--color-primary); box-shadow: 0 0 10px var(--color-primary); }
-        .nav-row { display: flex; gap: 10px; }
 
-        /* ================= MAIN CONTENT ================= */
-        .main-content { flex: 1; padding: 30px 40px; display: flex; flex-direction: column; overflow-y: auto; }
-        .main-content::-webkit-scrollbar { width: 0; }
-
-        .page-header { font-size: 24px; font-weight: 900; margin-bottom: 30px; letter-spacing: 1px; }
-
-        /* Tấm thẻ chức năng (Cards) */
-        .card {
-            background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px;
-            margin-bottom: 24px; border: 1px solid var(--border-light); position: relative;
-            transition: var(--transition);
+        /* Các mục Menu bên trái */
+        .nav-group { margin-bottom: 12px; }
+        .nav-title {
+            font-size: 10px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 5px;
         }
-        .card:hover { border-color: var(--border-glow); background: var(--bg-surface-hover); }
+        .nav-title span { color: #8e8e93; font-weight: bold; }
         
-        .card-title {
-            position: absolute; top: -11px; left: 24px; background: #1c1d24; padding: 0 12px;
-            font-size: 12px; font-weight: 800; border-radius: 4px; display: flex; align-items: center; gap: 6px;
+        .nav-btn {
+            background-color: #2c2c2e; /* Màu xám của nút chưa chọn */
+            color: #8e8e93;
+            border: none;
+            padding: 12px 0;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 900;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+        .nav-btn.active {
+            background-color: #007bff; /* Màu xanh nút đang chọn */
+            color: #fff;
+        }
+        .nav-row { display: flex; gap: 6px; }
+
+        /* --- Nội Dung Bên Phải --- */
+        .main-content {
+            flex: 1;
+            padding: 20px 30px 20px 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        /* Khung có viền cắt ngang chữ (Fieldset chuẩn) */
+        fieldset {
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        legend {
+            font-size: 13px;
+            font-weight: 900;
+            padding: 0 10px;
+            margin-left: 10px;
         }
         
-        /* Hiệu ứng màu từng card */
-        .card.green { border-color: rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.02); }
-        .card.green .card-title { color: var(--color-green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        /* Màu viền */
+        .fs-green { border: 2px solid #30d158; }
+        .fs-green legend { color: #30d158; }
         
-        .card.orange { border-color: rgba(245, 158, 11, 0.2); box-shadow: inset 0 0 30px rgba(245, 158, 11, 0.02); }
-        .card.orange .card-title { color: var(--color-orange); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .fs-orange { border: 2px solid #ff9f0a; }
+        .fs-orange legend { color: #ff9f0a; }
         
-        .card.blue { border-color: rgba(14, 165, 233, 0.2); box-shadow: inset 0 0 30px rgba(14, 165, 233, 0.02); }
-        .card.blue .card-title { color: var(--color-blue); border: 1px solid rgba(14, 165, 233, 0.2); }
+        .fs-blue { border: 2px solid #64d2ff; }
+        .fs-blue legend { color: #64d2ff; }
 
-        /* Row Layout */
-        .flex-row { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+        /* Hàng Checkbox & Banner */
+        .center-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: stretch;
+        }
 
-        /* Custom Checkbox */
-        .checkbox-btn {
-            flex: 1; display: flex; align-items: center; gap: 14px;
-            background: var(--bg-surface); border: 1px solid var(--border-light);
-            padding: 14px 16px; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);
+        .check-item {
+            background-color: #2c2c2e;
+            padding: 10px;
+            border-radius: 10px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
         }
-        .checkbox-btn:hover { background: var(--bg-surface-hover); transform: translateY(-2px); border-color: var(--border-glow); }
-        .checkbox-btn.active { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.4); }
-        
-        .chk-box {
-            width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--text-muted);
-            display: flex; justify-content: center; align-items: center; transition: var(--transition);
+        .check-circle {
+            width: 20px;
+            height: 20px;
+            background-color: #8e8e93;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: transparent;
+            font-size: 12px;
+            font-weight: bold;
         }
-        .checkbox-btn.active .chk-box { background: var(--color-green); border-color: var(--color-green); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
-        .chk-box svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(0.5); transition: var(--transition); }
-        .checkbox-btn.active .chk-box svg { opacity: 1; transform: scale(1); }
+        .check-item.active .check-circle {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .check-text { display: flex; flex-direction: column; }
+        .check-title { font-size: 12px; font-weight: 900; color: #fff; }
+        .check-sub { font-size: 9px; color: #8e8e93; margin-top: 2px; }
 
-        .chk-info h4 { font-size: 13px; font-weight: 800; color: var(--text-main); }
-        .chk-info p { font-size: 11px; font-weight: 600; color: var(--text-dim); margin-top: 4px; }
+        /* Khung Banner Skin */
+        .skin-banner {
+            width: 140px;
+            background: linear-gradient(to right, #ff4d4d, #ff9f0a);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .skin-banner strong { font-size: 13px; font-weight: 900; }
+        .skin-banner span { font-size: 7px; margin-top: 3px; }
 
-        /* Premium Banner */
-        .promo-banner {
-            width: 180px; height: 66px; border-radius: var(--radius-md); cursor: pointer;
-            background: linear-gradient(135deg, #f43f5e 0%, #f97316 100%);
-            position: relative; overflow: hidden; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
-            box-shadow: 0 10px 20px rgba(244, 63, 94, 0.25); transition: var(--transition);
+        /* Dropdown (Khung chọn) */
+        .select-wrapper { position: relative; width: 100%; }
+        .custom-select {
+            width: 100%;
+            background-color: #2c2c2e;
+            color: #fff;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 900;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
         }
-        .promo-banner::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.2)"/></svg>');
-            opacity: 0.5;
-        }
-        .promo-banner:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(244, 63, 94, 0.4); filter: brightness(1.1); }
-        .promo-title { font-size: 13px; font-weight: 900; color: #fff; z-index: 2; text-transform: uppercase; letter-spacing: 0.5px; }
-        .promo-sub { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.8); margin-top: 4px; z-index: 2; }
-
-        /* Dropdown Select Custom */
-        .select-box { position: relative; width: 100%; }
-        .select-box select {
-            width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-light);
-            color: var(--text-main); font-size: 13px; font-weight: 700; padding: 16px 20px;
-            border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);
-            font-family: 'Montserrat', sans-serif; outline: none;
-        }
-        .select-box select:hover, .select-box select:focus { background: var(--bg-surface-hover); border-color: var(--border-glow); }
-        .select-box select option { background: #1c1d24; color: #fff; }
-        .select-icon {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); pointer-events: none;
-            width: 16px; height: 16px; fill: none; stroke: var(--text-dim); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        .select-wrapper::after {
+            content: "﹀";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e93;
+            font-weight: bold;
+            pointer-events: none;
         }
 
         /* Camera Controls */
-        .cam-controls { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; }
-        
-        /* Modern Toggle Switch */
+        .camera-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5px;
+        }
         .toggle {
-            width: 56px; height: 30px; background: var(--text-muted); border-radius: 30px;
-            position: relative; cursor: pointer; transition: var(--transition); border: 2px solid transparent;
+            width: 45px;
+            height: 24px;
+            background-color: #007bff;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
         }
-        .toggle.active { background: var(--color-primary); border-color: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--color-primary-glow); }
-        .toggle::after {
-            content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px;
-            background: #fff; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        .toggle-circle {
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: absolute;
+            right: 3px;
+            top: 3px;
         }
-        .toggle.active::after { transform: translateX(26px); }
-
-        .cam-stat { display: flex; align-items: center; gap: 16px; }
-        .cam-stat span { font-size: 11px; font-weight: 800; color: var(--text-dim); line-height: 1.3; }
-        .cam-stat strong { font-size: 28px; font-weight: 900; color: var(--text-main); }
-
-        .btn-action {
-            background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-main);
-            padding: 14px 32px; border-radius: var(--radius-md); font-size: 13px; font-weight: 800;
-            cursor: pointer; transition: var(--transition); letter-spacing: 0.5px;
+        .cam-text {
+            font-size: 10px;
+            color: #8e8e93;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .btn-action:hover { background: var(--text-main); color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: translateY(-2px); }
-
+        .cam-num {
+            font-size: 24px;
+            color: #fff;
+        }
+        .btn-khoacam {
+            background-color: #2c2c2e;
+            color: #8e8e93;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div class="ingame-bg"></div>
 
-    <div class="menu-wrapper">
-        <div class="close-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </div>
+    <img src="https://i.imgur.com/8Q5g4xM.png" alt="My Avatar" class="my-avatar">
+
+    <div class="menu-container">
+        <div class="close-btn">×</div>
 
         <div class="sidebar">
-            <div class="logo-box">
-                <div class="version-badge">2.0</div>
-                <div class="logo-text">
-                    <h1>DANGTUNG</h1>
-                    <span>Powered by DangTung</span>
+            <div class="logo-section">
+                <div class="version">2.0</div>
+                <div class="brand">
+                    <div class="brand-title">DANG<br>TUNG</div>
+                    <div class="brand-sub">Powered by DangTung</div>
                 </div>
             </div>
 
-            <div class="nav-section">
-                <div class="nav-label">Chức năng chính <span class="sub">Căn bản</span></div>
-                <div class="nav-item active">Chức Năng Chính</div>
+            <div class="nav-group">
+                <div class="nav-title">CHỨC NĂNG CHÍNH <span>CĂN BẢN</span></div>
+                <button class="nav-btn active">CHỨC NĂNG CHÍNH</button>
             </div>
 
-            <div class="nav-section">
-                <div class="nav-label">ESP Player <span class="sub">Streamer</span></div>
-                <div class="nav-item">Vẽ ESP</div>
+            <div class="nav-group">
+                <div class="nav-title">ESP PLAYER <span>CHO STREAMER</span></div>
+                <button class="nav-btn">VẼ ESP</button>
             </div>
 
-            <div class="nav-section">
-                <div class="nav-label">MICS <span class="sub">Pro Play</span></div>
-                <div class="nav-item">Tự Động Skill</div>
-                <div class="nav-item">Aimbot Skill</div>
+            <div class="nav-group">
+                <div class="nav-title">MICS <span>TÍNH NĂNG PRO PLAY</span></div>
+                <button class="nav-btn">TỰ ĐỘNG SKILL</button>
+                <button class="nav-btn">AIMBOT SKILL</button>
             </div>
 
-            <div class="nav-section">
-                <div class="nav-label">Tools <span class="sub">Custom</span></div>
-                <div class="nav-item">Mod File</div>
+            <div class="nav-group">
+                <div class="nav-title">TOOLS <span>CUSTOM GAME</span></div>
+                <button class="nav-btn">MOD</button>
                 <div class="nav-row">
-                    <div class="nav-item" style="justify-content: center;">Tools</div>
-                    <div class="nav-item" style="justify-content: center;">More</div>
+                    <button class="nav-btn">TOOLS</button>
+                    <button class="nav-btn">MORE</button>
                 </div>
             </div>
         </div>
 
         <div class="main-content">
-            <h2 class="page-header">CHỨC NĂNG CHÍNH</h2>
+            <div class="page-title">CHỨC NĂNG CHÍNH</div>
 
-            <div class="card green">
-                <div class="card-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    TRUNG TÂM
-                </div>
-                
-                <div class="flex-row">
-                    <div class="checkbox-btn active" onclick="this.classList.toggle('active')">
-                        <div class="chk-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                        <div class="chk-info">
-                            <h4>MAP HACK</h4>
-                            <p>Hiển Thị Tầm Nhìn Rộng</p>
+            <fieldset class="fs-green">
+                <legend>TRUNG TÂM</legend>
+                <div class="center-row">
+                    <div class="check-item active">
+                        <div class="check-circle">✓</div>
+                        <div class="check-text">
+                            <span class="check-title">MAP HACK</span>
+                            <span class="check-sub">Hiển Thị Tầm Nhìn</span>
                         </div>
                     </div>
-
-                    <div class="checkbox-btn active" onclick="this.classList.toggle('active')">
-                        <div class="chk-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                        <div class="chk-info">
-                            <h4>TIME HỒI ULTI</h4>
-                            <p>Hiển Thị Thời Gian Hồi Chiêu</p>
+                    <div class="check-item active">
+                        <div class="check-circle">✓</div>
+                        <div class="check-text">
+                            <span class="check-title">TIME HỒI ULTI</span>
+                            <span class="check-sub">Hiển Thị Thời Gian Hồi</span>
                         </div>
                     </div>
-
-                    <div class="promo-banner">
-                        <span class="promo-title">UNLOCK FULL SKIN</span>
-                        <span class="promo-sub">NHẤN GIỮ ĐỂ XEM TUỲ CHỌN</span>
+                    <div class="skin-banner">
+                        <strong>UNLOCK FULL SKIN</strong>
+                        <span>NHẤN GIỮ ĐỂ XEM THÊM TUỲ CHỌN</span>
                     </div>
                 </div>
-
-                <div class="select-box">
-                    <select>
-                        <option>Tên Mặc Định | Tắt Cảnh Báo</option>
-                        <option>Hiển Thị Tên Thật</option>
-                        <option>Ẩn Toàn Bộ Thông Tin</option>
+                <div class="select-wrapper">
+                    <select class="custom-select">
+                        <option>Tên Mặc Định | Tắt</option>
                     </select>
-                    <svg class="select-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="card orange">
-                <div class="card-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    CHẾ ĐỘ CHƠI !
-                </div>
-                <div class="select-box">
-                    <select>
-                        <option>CHƠI KÍN KHÔNG LỘ LIỄU (AN TOÀN)</option>
-                        <option>CHƠI LỘ LIỄU (RỦI RO CAO)</option>
+            <fieldset class="fs-orange">
+                <legend>CHẾ ĐỘ CHƠI !</legend>
+                <div class="select-wrapper">
+                    <select class="custom-select">
+                        <option>CHƠI KÍN KHÔNG LỘ LIỄU</option>
                     </select>
-                    <svg class="select-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="card blue">
-                <div class="card-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    ĐIỀU CHỈNH CAMERA
-                </div>
-                <div class="cam-controls">
-                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
-                    <div class="cam-stat">
-                        <span>CAMERA<br>THẲNG / XA</span>
-                        <strong>1.0</strong>
+            <fieldset class="fs-blue">
+                <legend>ĐIỀU CHỈNH CAMERA</legend>
+                <div class="camera-row">
+                    <div class="toggle">
+                        <div class="toggle-circle"></div>
                     </div>
-                    <button class="btn-action">KHOÁ CAM</button>
+                    <div class="cam-text">
+                        CAMERA<br>THẲNG
+                        <span class="cam-num">1.0</span>
+                    </div>
+                    <button class="btn-khoacam">KHOÁ CAM</button>
                 </div>
-            </div>
-
+            </fieldset>
         </div>
     </div>
+
 </body>
 </html>
