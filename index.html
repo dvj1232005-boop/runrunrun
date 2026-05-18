@@ -3,426 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DangTung Mod Menu Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <title>DangTung Pro Mod Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* ================= RESET & CƠ BẢN ================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            user-select: none;
+        /* ================= BIẾN CSS CHUẨN UX/UI ================= */
+        :root {
+            --bg-body: #0a0b10;
+            --bg-menu: rgba(22, 24, 31, 0.85);
+            --bg-sidebar: rgba(18, 19, 25, 0.6);
+            --bg-surface: rgba(255, 255, 255, 0.03);
+            --bg-surface-hover: rgba(255, 255, 255, 0.08);
+            
+            --border-light: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #ffffff;
+            --text-dim: #8b92a5;
+            --text-muted: #5e6475;
+            
+            --color-primary: #2563eb;
+            --color-primary-glow: rgba(37, 99, 235, 0.4);
+            --color-green: #10b981;
+            --color-orange: #f59e0b;
+            --color-blue: #0ea5e9;
+            --color-red: #ef4444;
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
+        /* ================= RESET ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
-            background-color: #000; /* Nền giả lập màn hình tối */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1a1c23 0%, var(--bg-body) 100%);
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            color: var(--text-main); overflow: hidden;
         }
 
-        /* ================= CONTAINER CHÍNH ================= */
-        .menu-container {
-            width: 900px;
-            height: 500px;
-            background: #18191d;
-            border-radius: 24px;
-            display: flex;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
-            overflow: hidden;
+        /* Hình nền giả lập ingame */
+        .ingame-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 8px);
+            z-index: -1; opacity: 0.5;
         }
 
-        /* Nút X Đóng Menu */
+        /* ================= CONTAINER KÍNH MỜ (GLASSMORPHISM) ================= */
+        .menu-wrapper {
+            width: 920px; height: 540px;
+            background: var(--bg-menu);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 2px 15px rgba(255, 255, 255, 0.05);
+            display: flex; position: relative;
+            animation: menuEntry 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0; transform: scale(0.95) translateY(10px);
+        }
+        @keyframes menuEntry { to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* Nút Tắt */
         .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 32px;
-            height: 32px;
-            background-color: transparent;
-            border: 2px solid #ff4a4a;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #ff4a4a;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.2s ease;
+            position: absolute; top: 20px; right: 24px;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--bg-surface); border: 1px solid var(--border-light);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: var(--transition); z-index: 10; color: var(--text-dim);
         }
         .close-btn:hover {
-            background-color: #ff4a4a;
-            color: #18191d;
-            box-shadow: 0 0 10px rgba(255, 74, 74, 0.5);
+            background: rgba(239, 68, 68, 0.1); border-color: var(--color-red); color: var(--color-red);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); transform: rotate(90deg);
         }
 
-        /* ================= SIDEBAR (CỘT TRÁI) ================= */
+        /* ================= SIDEBAR ================= */
         .sidebar {
-            width: 270px;
-            background: #18191d;
-            padding: 25px 20px;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border-light);
+            padding: 30px 24px; display: flex; flex-direction: column; overflow-y: auto;
         }
+        .sidebar::-webkit-scrollbar { width: 0; }
 
-        /* Logo Area */
-        .logo-section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
+        .logo-box { display: flex; align-items: center; margin-bottom: 40px; }
+        .version-badge {
+            background: linear-gradient(135deg, var(--color-primary), #3b82f6);
+            padding: 8px 12px; border-radius: var(--radius-sm);
+            font-size: 16px; font-weight: 800; color: #fff; margin-right: 14px;
+            box-shadow: 0 8px 16px var(--color-primary-glow);
         }
-        .version-box {
-            border: 2px solid #1a73e8;
-            border-radius: 10px;
-            padding: 6px 10px;
-            font-size: 18px;
-            font-weight: 900;
-            margin-right: 12px;
-            color: #fff;
-            box-shadow: 0 0 10px rgba(26, 115, 232, 0.3);
-        }
-        .logo-text { display: flex; flex-direction: column; }
-        .logo-title { font-size: 18px; font-weight: 900; letter-spacing: 1px; }
-        .logo-subtitle { font-size: 9px; color: #888; text-transform: uppercase; margin-top: 2px; font-weight: 700;}
+        .logo-text h1 { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; line-height: 1.1; }
+        .logo-text span { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Menu Items */
-        .nav-group { margin-bottom: 20px; }
-        .nav-title {
-            font-size: 10px;
-            color: #fff;
-            font-weight: 800;
-            margin-bottom: 10px;
-            padding-left: 5px;
-            letter-spacing: 0.5px;
+        .nav-section { margin-bottom: 24px; }
+        .nav-label { font-size: 10px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; justify-content: space-between;}
+        .nav-label span.sub { color: var(--text-muted); font-weight: 600; }
+
+        .nav-item {
+            width: 100%; background: transparent; border: 1px solid transparent; color: var(--text-dim);
+            padding: 14px 16px; border-radius: var(--radius-md); font-size: 13px; font-weight: 700;
+            text-align: left; cursor: pointer; transition: var(--transition); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .nav-title span.sub { color: #666; font-weight: 600; margin-left: 5px;}
+        .nav-item::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); transition: var(--transition);
+        }
+        .nav-item:hover { background: var(--bg-surface); color: var(--text-main); transform: translateX(4px); }
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3); color: var(--text-main);
+        }
+        .nav-item.active::before { background: var(--color-primary); box-shadow: 0 0 10px var(--color-primary); }
+        .nav-row { display: flex; gap: 10px; }
+
+        /* ================= MAIN CONTENT ================= */
+        .main-content { flex: 1; padding: 30px 40px; display: flex; flex-direction: column; overflow-y: auto; }
+        .main-content::-webkit-scrollbar { width: 0; }
+
+        .page-header { font-size: 24px; font-weight: 900; margin-bottom: 30px; letter-spacing: 1px; }
+
+        /* Tấm thẻ chức năng (Cards) */
+        .card {
+            background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px;
+            margin-bottom: 24px; border: 1px solid var(--border-light); position: relative;
+            transition: var(--transition);
+        }
+        .card:hover { border-color: var(--border-glow); background: var(--bg-surface-hover); }
         
-        .nav-btn {
-            background-color: #26282f;
-            border: none;
-            color: #8c92a0;
-            padding: 14px 15px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 8px;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        .nav-btn.active {
-            background-color: #1a73e8;
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
-        }
-        .nav-btn:hover:not(.active) {
-            background-color: #32353e;
-            color: #fff;
-        }
-        .nav-row { display: flex; gap: 8px; }
-        .nav-row .nav-btn { flex: 1; }
-
-        /* ================= MAIN CONTENT (BÊN PHẢI) ================= */
-        .main-content {
-            flex: 1;
-            padding: 25px 35px;
-            display: flex;
-            flex-direction: column;
-            background: #18191d;
+        .card-title {
+            position: absolute; top: -11px; left: 24px; background: #1c1d24; padding: 0 12px;
+            font-size: 12px; font-weight: 800; border-radius: 4px; display: flex; align-items: center; gap: 6px;
         }
         
-        .page-title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 900;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-            color: #fff;
+        /* Hiệu ứng màu từng card */
+        .card.green { border-color: rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.02); }
+        .card.green .card-title { color: var(--color-green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        
+        .card.orange { border-color: rgba(245, 158, 11, 0.2); box-shadow: inset 0 0 30px rgba(245, 158, 11, 0.02); }
+        .card.orange .card-title { color: var(--color-orange); border: 1px solid rgba(245, 158, 11, 0.2); }
+        
+        .card.blue { border-color: rgba(14, 165, 233, 0.2); box-shadow: inset 0 0 30px rgba(14, 165, 233, 0.02); }
+        .card.blue .card-title { color: var(--color-blue); border: 1px solid rgba(14, 165, 233, 0.2); }
+
+        /* Row Layout */
+        .flex-row { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+
+        /* Custom Checkbox */
+        .checkbox-btn {
+            flex: 1; display: flex; align-items: center; gap: 14px;
+            background: var(--bg-surface); border: 1px solid var(--border-light);
+            padding: 14px 16px; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);
+        }
+        .checkbox-btn:hover { background: var(--bg-surface-hover); transform: translateY(-2px); border-color: var(--border-glow); }
+        .checkbox-btn.active { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.4); }
+        
+        .chk-box {
+            width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--text-muted);
+            display: flex; justify-content: center; align-items: center; transition: var(--transition);
+        }
+        .checkbox-btn.active .chk-box { background: var(--color-green); border-color: var(--color-green); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+        .chk-box svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(0.5); transition: var(--transition); }
+        .checkbox-btn.active .chk-box svg { opacity: 1; transform: scale(1); }
+
+        .chk-info h4 { font-size: 13px; font-weight: 800; color: var(--text-main); }
+        .chk-info p { font-size: 11px; font-weight: 600; color: var(--text-dim); margin-top: 4px; }
+
+        /* Premium Banner */
+        .promo-banner {
+            width: 180px; height: 66px; border-radius: var(--radius-md); cursor: pointer;
+            background: linear-gradient(135deg, #f43f5e 0%, #f97316 100%);
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            box-shadow: 0 10px 20px rgba(244, 63, 94, 0.25); transition: var(--transition);
+        }
+        .promo-banner::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.2)"/></svg>');
+            opacity: 0.5;
+        }
+        .promo-banner:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(244, 63, 94, 0.4); filter: brightness(1.1); }
+        .promo-title { font-size: 13px; font-weight: 900; color: #fff; z-index: 2; text-transform: uppercase; letter-spacing: 0.5px; }
+        .promo-sub { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.8); margin-top: 4px; z-index: 2; }
+
+        /* Dropdown Select Custom */
+        .select-box { position: relative; width: 100%; }
+        .select-box select {
+            width: 100%; appearance: none; background: var(--bg-surface); border: 1px solid var(--border-light);
+            color: var(--text-main); font-size: 13px; font-weight: 700; padding: 16px 20px;
+            border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);
+            font-family: 'Montserrat', sans-serif; outline: none;
+        }
+        .select-box select:hover, .select-box select:focus { background: var(--bg-surface-hover); border-color: var(--border-glow); }
+        .select-box select option { background: #1c1d24; color: #fff; }
+        .select-icon {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); pointer-events: none;
+            width: 16px; height: 16px; fill: none; stroke: var(--text-dim); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
 
-        /* Group Borders (Viền màu Neon) */
-        .section {
-            border-radius: 18px;
-            padding: 25px 20px 20px 20px;
-            margin-bottom: 25px;
-            position: relative;
-            background: transparent;
-        }
-        .section-title {
-            position: absolute;
-            top: -10px;
-            left: 25px;
-            background-color: #18191d; /* Trùng màu nền để cắt viền */
-            padding: 0 10px;
-            font-size: 13px;
-            font-weight: 900;
-        }
+        /* Camera Controls */
+        .cam-controls { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; }
         
-        /* Màu Neon từng khối */
-        .section.green { border: 2px solid #00ff88; }
-        .section.green .section-title { color: #00ff88; }
-        
-        .section.orange { border: 2px solid #ff9900; }
-        .section.orange .section-title { color: #ff9900; }
-        
-        .section.blue { border: 2px solid #00ccff; }
-        .section.blue .section-title { color: #00ccff; }
-
-        /* ================= CÁC ELEMENT BÊN TRONG ================= */
-        .control-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 15px;
+        /* Modern Toggle Switch */
+        .toggle {
+            width: 56px; height: 30px; background: var(--text-muted); border-radius: 30px;
+            position: relative; cursor: pointer; transition: var(--transition); border: 2px solid transparent;
         }
-
-        /* Checkbox Tùy chỉnh */
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: #26282f;
-            padding: 12px 15px;
-            border-radius: 14px;
-            flex: 1;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .checkbox-item:hover { background-color: #2c2e36; }
-        
-        .check-icon {
-            width: 24px;
-            height: 24px;
-            background-color: #4a4d57;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: transparent;
-            font-size: 14px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .checkbox-item.checked .check-icon {
-            background-color: #fff;
-            color: #18191d;
-        }
-        
-        .check-info { display: flex; flex-direction: column; }
-        .check-title { font-weight: 800; font-size: 13px; color: #fff;}
-        .check-desc { font-size: 10px; color: #8c92a0; margin-top: 3px; font-weight: 600;}
-
-        /* Banner Mở Khoá Skin (Mô phỏng hình ảnh xịn xò) */
-        .banner {
-            width: 160px;
-            height: 60px;
-            background: linear-gradient(45deg, #ff3366, #ff9933);
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        /* Hiệu ứng bóng bẩy cho banner */
-        .banner::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
-            transform: skewX(-20deg); transition: 0.5s;
-        }
-        .banner:hover::before { left: 150%; }
-        
-        .banner-title { font-weight: 900; font-size: 13px; z-index: 2;}
-        .banner-sub { font-size: 7px; font-weight: 700; margin-top: 4px; z-index: 2; opacity: 0.9;}
-
-        /* Dropdown (Khung Chọn) */
-        .dropdown-wrapper { position: relative; width: 100%; }
-        .dropdown {
-            width: 100%;
-            background-color: #26282f;
-            border: none;
-            color: #fff;
-            padding: 16px 20px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 800;
-            appearance: none;
-            outline: none;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .dropdown:hover { background-color: #2c2e36; }
-        .dropdown-wrapper::after {
-            content: "﹀";
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            color: #8c92a0;
-            pointer-events: none;
-            font-weight: bold;
-        }
-
-        /* Toggle & Điều Chỉnh Camera */
-        .camera-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
-        }
-        
-        /* Công tắc (Toggle Switch) giống iOS */
-        .toggle-switch {
-            width: 50px;
-            height: 26px;
-            background-color: #1a73e8;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-        }
-        .toggle-circle {
-            width: 20px;
-            height: 20px;
-            background-color: #fff;
-            border-radius: 50%;
-            position: absolute;
-            top: 3px;
-            right: 4px;
+        .toggle.active { background: var(--color-primary); border-color: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--color-primary-glow); }
+        .toggle::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px;
+            background: #fff; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
+        .toggle.active::after { transform: translateX(26px); }
 
-        .camera-text {
-            font-size: 11px;
-            color: #8c92a0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-weight: 800;
-        }
-        .camera-val { font-size: 26px; color: #fff; font-weight: 900; line-height: 1;}
+        .cam-stat { display: flex; align-items: center; gap: 16px; }
+        .cam-stat span { font-size: 11px; font-weight: 800; color: var(--text-dim); line-height: 1.3; }
+        .cam-stat strong { font-size: 28px; font-weight: 900; color: var(--text-main); }
 
-        /* Nút Khoá Cam */
         .btn-action {
-            background-color: #26282f;
-            border: none;
-            color: #8c92a0;
-            padding: 12px 30px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-main);
+            padding: 14px 32px; border-radius: var(--radius-md); font-size: 13px; font-weight: 800;
+            cursor: pointer; transition: var(--transition); letter-spacing: 0.5px;
         }
-        .btn-action:hover {
-            background-color: #32353e;
-            color: #fff;
-        }
+        .btn-action:hover { background: var(--text-main); color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.3); transform: translateY(-2px); }
+
     </style>
 </head>
 <body>
+    <div class="ingame-bg"></div>
 
-    <div class="menu-container">
-        <div class="close-btn">×</div>
+    <div class="menu-wrapper">
+        <div class="close-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
 
         <div class="sidebar">
-            <div class="logo-section">
-                <div class="version-box">2.0</div>
+            <div class="logo-box">
+                <div class="version-badge">2.0</div>
                 <div class="logo-text">
-                    <span class="logo-title">DANGTUNG</span>
-                    <span class="logo-subtitle">Powered by DangTung</span>
+                    <h1>DANGTUNG</h1>
+                    <span>Powered by DangTung</span>
                 </div>
             </div>
 
-            <div class="nav-group">
-                <div class="nav-title">CHỨC NĂNG CHÍNH <span class="sub">CĂN BẢN</span></div>
-                <button class="nav-btn active">CHỨC NĂNG CHÍNH</button>
+            <div class="nav-section">
+                <div class="nav-label">Chức năng chính <span class="sub">Căn bản</span></div>
+                <div class="nav-item active">Chức Năng Chính</div>
             </div>
 
-            <div class="nav-group">
-                <div class="nav-title">ESP PLAYER <span class="sub">CHO STREAMER</span></div>
-                <button class="nav-btn">VẼ ESP</button>
+            <div class="nav-section">
+                <div class="nav-label">ESP Player <span class="sub">Streamer</span></div>
+                <div class="nav-item">Vẽ ESP</div>
             </div>
 
-            <div class="nav-group">
-                <div class="nav-title">MICS <span class="sub">TÍNH NĂNG PRO PLAY</span></div>
-                <button class="nav-btn">TỰ ĐỘNG SKILL</button>
-                <button class="nav-btn">AIMBOT SKILL</button>
+            <div class="nav-section">
+                <div class="nav-label">MICS <span class="sub">Pro Play</span></div>
+                <div class="nav-item">Tự Động Skill</div>
+                <div class="nav-item">Aimbot Skill</div>
             </div>
 
-            <div class="nav-group">
-                <div class="nav-title">TOOLS <span class="sub">CUSTOM GAME</span></div>
-                <button class="nav-btn">MOD</button>
-                <div class="nav-row" style="margin-top: 8px;">
-                    <button class="nav-btn">TOOLS</button>
-                    <button class="nav-btn">MORE</button>
+            <div class="nav-section">
+                <div class="nav-label">Tools <span class="sub">Custom</span></div>
+                <div class="nav-item">Mod File</div>
+                <div class="nav-row">
+                    <div class="nav-item" style="justify-content: center;">Tools</div>
+                    <div class="nav-item" style="justify-content: center;">More</div>
                 </div>
             </div>
         </div>
 
         <div class="main-content">
-            <h2 class="page-title">CHỨC NĂNG CHÍNH</h2>
+            <h2 class="page-header">CHỨC NĂNG CHÍNH</h2>
 
-            <div class="section green">
-                <div class="section-title">TRUNG TÂM</div>
-                <div class="control-row">
-                    <div class="checkbox-item checked">
-                        <div class="check-icon">✓</div>
-                        <div class="check-info">
-                            <span class="check-title">MAP HACK</span>
-                            <span class="check-desc">Hiển Thị Tầm Nhìn</span>
+            <div class="card green">
+                <div class="card-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    TRUNG TÂM
+                </div>
+                
+                <div class="flex-row">
+                    <div class="checkbox-btn active" onclick="this.classList.toggle('active')">
+                        <div class="chk-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="chk-info">
+                            <h4>MAP HACK</h4>
+                            <p>Hiển Thị Tầm Nhìn Rộng</p>
                         </div>
                     </div>
-                    <div class="checkbox-item checked">
-                        <div class="check-icon">✓</div>
-                        <div class="check-info">
-                            <span class="check-title">TIME HỒI ULTI</span>
-                            <span class="check-desc">Hiển Thị Thời Gian Hồi</span>
+
+                    <div class="checkbox-btn active" onclick="this.classList.toggle('active')">
+                        <div class="chk-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                        <div class="chk-info">
+                            <h4>TIME HỒI ULTI</h4>
+                            <p>Hiển Thị Thời Gian Hồi Chiêu</p>
                         </div>
                     </div>
-                    <div class="banner">
-                        <span class="banner-title">UNLOCK FULL SKIN</span>
-                        <span class="banner-sub">NHẤN GIỮ ĐỂ XEM THÊM TUỲ CHỌN</span>
+
+                    <div class="promo-banner">
+                        <span class="promo-title">UNLOCK FULL SKIN</span>
+                        <span class="promo-sub">NHẤN GIỮ ĐỂ XEM TUỲ CHỌN</span>
                     </div>
                 </div>
-                <div class="dropdown-wrapper">
-                    <select class="dropdown">
-                        <option>Tên Mặc Định | Tắt</option>
+
+                <div class="select-box">
+                    <select>
+                        <option>Tên Mặc Định | Tắt Cảnh Báo</option>
+                        <option>Hiển Thị Tên Thật</option>
+                        <option>Ẩn Toàn Bộ Thông Tin</option>
                     </select>
+                    <svg class="select-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
             </div>
 
-            <div class="section orange">
-                <div class="section-title">CHẾ ĐỘ CHƠI !</div>
-                <div class="dropdown-wrapper">
-                    <select class="dropdown">
-                        <option>CHƠI KÍN KHÔNG LỘ LIỄU</option>
+            <div class="card orange">
+                <div class="card-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    CHẾ ĐỘ CHƠI !
+                </div>
+                <div class="select-box">
+                    <select>
+                        <option>CHƠI KÍN KHÔNG LỘ LIỄU (AN TOÀN)</option>
+                        <option>CHƠI LỘ LIỄU (RỦI RO CAO)</option>
                     </select>
+                    <svg class="select-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
             </div>
 
-            <div class="section blue">
-                <div class="section-title">ĐIỀU CHỈNH CAMERA</div>
-                <div class="camera-controls">
-                    <div class="toggle-switch">
-                        <div class="toggle-circle"></div>
-                    </div>
-                    <div class="camera-text">
-                        <span>CAMERA<br>THẲNG</span>
-                        <span class="camera-val">1.0</span>
+            <div class="card blue">
+                <div class="card-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    ĐIỀU CHỈNH CAMERA
+                </div>
+                <div class="cam-controls">
+                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                    <div class="cam-stat">
+                        <span>CAMERA<br>THẲNG / XA</span>
+                        <strong>1.0</strong>
                     </div>
                     <button class="btn-action">KHOÁ CAM</button>
                 </div>
@@ -430,6 +346,5 @@
 
         </div>
     </div>
-
 </body>
 </html>
