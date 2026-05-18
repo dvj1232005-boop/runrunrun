@@ -1,530 +1,402 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Ultimate Run Tracker</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a0c">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DangTung Mod Menu</title>
+    <style>
+        /* CSS Reset & Cơ bản */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000; /* Nền ngoài đen để làm nổi bật menu */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+        /* Container Menu Chính */
+        .menu-container {
+            width: 850px;
+            height: 480px;
+            background-color: #1c1d21;
+            border-radius: 20px;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+            border: 1px solid #2a2b30;
+        }
 
-<style>
-/* ===== DESIGN SYSTEM ===== */
-:root {
-  --bg: #0a0a0c;
-  --surface: #18181b;
-  --surface-blur: rgba(24, 24, 27, 0.7);
-  --text-main: #ffffff;
-  --text-muted: #a1a1aa;
-  --primary: #c084fc; /* Tím Neon */
-  --accent: #2dd4bf;  /* Xanh Mint */
-  --danger: #fb7185;  /* Đỏ Neon */
-  --nav-height: 80px;
-}
+        /* Nút Tắt (X) */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background-color: #24252a;
+            border: 2px solid #ff4a4a;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff4a4a;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.2s;
+        }
+        .close-btn:hover { background-color: #ff4a4a; color: #fff; }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-body {
-  background: var(--bg); color: var(--text-main);
-  font-family: 'Manrope', sans-serif;
-  overflow: hidden; height: 100vh; width: 100vw;
-  display: flex; flex-direction: column;
-}
+        /* --- Cột Trái (Sidebar) --- */
+        .sidebar {
+            width: 260px;
+            background-color: #1c1d21;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-right: 1px solid #2a2b30;
+        }
 
-/* ===== APP LAYOUT & TABS ===== */
-.view {
-  flex: 1; height: calc(100vh - var(--nav-height));
-  overflow-y: auto; overflow-x: hidden;
-  display: none; flex-direction: column;
-  animation: fadeIn 0.3s ease;
-  padding-bottom: 20px;
-}
-.view.active { display: flex; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Logo DangTung */
+        .logo-section { display: flex; align-items: center; margin-bottom: 25px; padding-left: 5px;}
+        .version-box {
+            border: 2px solid #1a73e8;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 22px;
+            font-weight: 900;
+            margin-right: 12px;
+            color: #fff;
+        }
+        .logo-text { display: flex; flex-direction: column; }
+        .logo-title { font-size: 18px; font-weight: 900; letter-spacing: 1px; line-height: 1.1;}
+        .logo-subtitle { font-size: 9px; color: #aaa; text-transform: uppercase; margin-top: 2px;}
 
-/* ===== TOP HEADER ===== */
-.header {
-  padding: env(safe-area-inset-top, 40px) 24px 20px;
-  display: flex; justify-content: space-between; align-items: center;
-  background: linear-gradient(180deg, var(--bg) 60%, transparent);
-  position: absolute; top: 0; left: 0; right: 0; z-index: 50;
-}
-.header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--text-main); }
-.header p { color: var(--text-muted); font-size: 13px; font-weight: 600; margin-top: 4px; }
+        /* Menu Cột Trái */
+        .nav-group { margin-bottom: 15px; }
+        .nav-title {
+            display: flex;
+            gap: 10px;
+            font-size: 10px;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+        .nav-title span.sub { color: #666; font-weight: normal;}
+        
+        .nav-btn {
+            background-color: #2c2e35;
+            border: none;
+            color: #9aa0a6;
+            padding: 12px 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 8px;
+            width: 100%;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .nav-btn.active {
+            background-color: #1a73e8;
+            color: #fff;
+        }
+        .nav-btn:hover:not(.active) { background-color: #383a42; color: #fff;}
+        .nav-row { display: flex; gap: 8px; }
+        .nav-row .nav-btn { flex: 1; }
 
-/* ===== RECORD VIEW (MAP & STATS) ===== */
-#view-record { position: relative; padding: 0; display: none; }
-#view-record.active { display: block; }
-.map-wrap { position: absolute; inset: 0; z-index: 1; }
-#map { width: 100%; height: 100%; }
-.leaflet-layer, .leaflet-control-attribution { filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(120%); }
+        /* Ẩn thanh cuộn của sidebar */
+        .sidebar::-webkit-scrollbar { display: none; }
 
-/* Glass Overlay cho Stats */
-.dashboard-overlay {
-  position: absolute; bottom: calc(var(--nav-height) + 20px); left: 16px; right: 16px;
-  background: var(--surface-blur); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.05); border-radius: 32px;
-  padding: 24px 20px; z-index: 10;
-  display: flex; flex-direction: column; align-items: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-}
+        /* --- Phần Nội Dung Chính (Phải) --- */
+        .main-content {
+            flex: 1;
+            padding: 20px 35px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
 
-.main-distance {
-  font-family: 'Space Grotesk', sans-serif; font-size: 72px; line-height: 1;
-  background: linear-gradient(135deg, #fff, var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 20px; text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-}
-.main-distance span { font-size: 20px; font-weight: 600; -webkit-text-fill-color: var(--text-muted); }
+        /* Khung Section (Viền màu) */
+        .section {
+            border-radius: 16px;
+            padding: 22px 20px 20px 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .section-title {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background-color: #1c1d21;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        
+        /* Màu viền từng Section */
+        .section.green { border: 2px solid #00e676; }
+        .section.green .section-title { color: #00e676; }
+        
+        .section.orange { border: 2px solid #ff9800; }
+        .section.orange .section-title { color: #ff9800; }
+        
+        .section.blue { border: 2px solid #2196f3; }
+        .section.blue .section-title { color: #2196f3; }
 
-.grid-stats { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
-.stat-box { text-align: center; }
-.stat-box .val { font-size: 22px; font-weight: 800; color: var(--text-main); }
-.stat-box .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        /* Các Nút Điều Khiển Bên Trong */
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
 
-/* Nút Chạy với SVG Vòng Tròn (Hold to Stop) */
-.action-btn-wrap { position: relative; width: 90px; height: 90px; }
-.run-btn {
-  width: 100%; height: 100%; border-radius: 50%; border: none;
-  background: var(--primary); color: #fff; font-size: 16px; font-weight: 800;
-  box-shadow: 0 0 30px rgba(192, 132, 252, 0.4);
-  position: absolute; inset: 0; z-index: 2; cursor: pointer;
-  transition: transform 0.2s;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.run-btn span.hint { font-size: 9px; font-weight: 600; opacity: 0.8; margin-top: 2px; }
-body.running .run-btn { background: var(--danger); box-shadow: 0 0 30px rgba(251, 113, 133, 0.4); }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #33363f;
+            padding: 10px 15px;
+            border-radius: 12px;
+            flex: 1;
+            cursor: pointer;
+        }
+        .check-icon {
+            width: 22px;
+            height: 22px;
+            background-color: #5f6368;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+        .checkbox-item.checked .check-icon { background-color: #1a73e8; }
+        
+        .check-info { display: flex; flex-direction: column; }
+        .check-title { font-weight: 900; font-size: 13px; }
+        .check-desc { font-size: 10px; color: #9aa0a6; margin-top: 2px;}
 
-/* Vòng tròn Progress báo hiệu lúc Hold to Stop */
-.progress-ring { position: absolute; top: -10px; left: -10px; width: 110px; height: 110px; z-index: 1; pointer-events: none; transform: rotate(-90deg); }
-.progress-ring circle { fill: transparent; stroke-width: 6; stroke-linecap: round; }
-.progress-ring .bg { stroke: rgba(255,255,255,0.1); }
-.progress-ring .fill { stroke: var(--danger); stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 0.1s linear; }
+        /* Banner Mở Khoá Skin */
+        .banner {
+            width: 170px;
+            height: 55px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.2;
+            cursor: pointer;
+        }
+        .banner-sub { font-size: 8px; font-weight: normal; margin-top: 3px; }
 
-/* ===== HISTORY VIEW ===== */
-#view-history { padding: calc(env(safe-area-inset-top, 40px) + 80px) 24px 20px; background: var(--bg); }
-.history-card {
-  background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 16px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.h-date { color: var(--primary); font-size: 12px; font-weight: 800; margin-bottom: 8px; }
-.h-dist { font-size: 28px; font-family: 'Space Grotesk'; font-weight: 700; }
-.h-stats { display: flex; gap: 16px; margin-top: 8px; font-size: 13px; color: var(--text-muted); }
-.empty-state { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 14px; }
+        /* Dropdown */
+        .dropdown-wrapper { position: relative; width: 100%; }
+        .dropdown {
+            width: 100%;
+            background-color: #2c2e35;
+            border: none;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 900;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+        }
+        .dropdown-wrapper::after {
+            content: "▼";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #666;
+            pointer-events: none;
+        }
 
-/* ===== PROFILE VIEW ===== */
-#view-profile { padding: calc(env(safe-area-inset-top, 40px) + 80px) 24px 20px; }
-.setting-group { background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-.setting-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.setting-item:last-child { border: none; padding-bottom: 0; }
-.toggle-switch { width: 50px; height: 28px; background: rgba(255,255,255,0.1); border-radius: 30px; position: relative; transition: 0.3s; }
-.toggle-switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: 0.3s; }
-.toggle-switch.active { background: var(--accent); }
-.toggle-switch.active::after { transform: translateX(22px); }
+        /* Toggle & Điều Chỉnh Camera */
+        .camera-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+        
+        .toggle-switch {
+            width: 55px;
+            height: 28px;
+            background-color: #1a73e8;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .toggle-circle {
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: absolute;
+            right: 4px;
+        }
 
-/* ===== BOTTOM NAVIGATION ===== */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height);
-  background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05);
-  display: flex; justify-content: space-around; align-items: center;
-  padding-bottom: env(safe-area-inset-bottom, 20px); z-index: 100;
-}
-.nav-item { color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-.nav-item svg { width: 24px; height: 24px; fill: currentColor; opacity: 0.5; transition: 0.3s; }
-.nav-item.active { color: var(--text-main); }
-.nav-item.active svg { fill: var(--primary); opacity: 1; transform: translateY(-2px); }
+        .camera-text {
+            font-size: 11px;
+            color: #9aa0a6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .camera-val { font-size: 24px; color: #fff; font-weight: 900; line-height: 1;}
 
-/* ===== COUNTDOWN OVERLAY ===== */
-.countdown-overlay {
-  position: fixed; inset: 0; background: var(--bg); z-index: 999;
-  display: flex; justify-content: center; align-items: center;
-  font-family: 'Space Grotesk'; font-size: 120px; color: var(--primary);
-  opacity: 0; pointer-events: none; transition: 0.3s; transform: scale(1.5);
-}
-.countdown-overlay.show { opacity: 1; pointer-events: auto; transform: scale(1); }
-
-</style>
+        .btn-action {
+            background-color: #2c2e35;
+            border: none;
+            color: #9aa0a6;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-action:hover { background-color: #383a42; color: #fff; }
+    </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div>
-    <h1>RunTracker <span style="color:var(--primary)">Pro</span></h1>
-    <p id="status-text">Sẵn sàng chạy</p>
-  </div>
-</div>
+    <div class="menu-container">
+        <div class="close-btn">×</div>
 
-<!-- VIEW: RECORD (MAP) -->
-<div id="view-record" class="view active">
-  <div class="map-wrap"><div id="map"></div></div>
-  
-  <div class="dashboard-overlay">
-    <div class="main-distance" id="distance">0.00<span>km</span></div>
-    
-    <div class="grid-stats">
-      <div class="stat-box">
-        <div class="val" id="time">00:00</div>
-        <div class="lbl">Thời gian</div>
-      </div>
-      <div class="stat-box">
-        <div class="val" id="pace">--'--"</div>
-        <div class="lbl">Pace</div>
-      </div>
-      <div class="stat-box">
-        <div class="val" id="calo">0</div>
-        <div class="lbl">Kcal</div>
-      </div>
-    </div>
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="version-box">2.0</div>
+                <div class="logo-text">
+                    <span class="logo-title">DANGTUNG</span>
+                    <span class="logo-subtitle">Powered by DangTung</span>
+                </div>
+            </div>
 
-    <div class="action-btn-wrap">
-      <svg class="progress-ring"><circle class="bg" cx="55" cy="55" r="50"></circle><circle class="fill" cx="55" cy="55" r="50" id="ringFill"></circle></svg>
-      <button class="run-btn" id="runBtn">
-        <span id="btnText">BẮT ĐẦU</span>
-        <span class="hint" id="btnHint">Chạm</span>
-      </button>
-    </div>
-  </div>
-</div>
+            <div class="nav-group">
+                <div class="nav-title">CHỨC NĂNG CHÍNH <span class="sub">CĂN BẢN</span></div>
+                <button class="nav-btn active">CHỨC NĂNG CHÍNH</button>
+            </div>
 
-<!-- VIEW: HISTORY -->
-<div id="view-history" class="view">
-  <div id="history-container">
-    <!-- Dữ liệu lịch sử sẽ render ở đây -->
-    <div class="empty-state">Chưa có cuốc chạy nào. Hãy xỏ giày vào!</div>
-  </div>
-</div>
+            <div class="nav-group">
+                <div class="nav-title">ESP PLAYER <span class="sub">CHO STREAMER</span></div>
+                <button class="nav-btn">VẼ ESP</button>
+            </div>
 
-<!-- VIEW: PROFILE -->
-<div id="view-profile" class="view">
-  <div class="setting-group">
-    <div class="setting-item">
-      <div>
-        <div style="font-weight: 800;">Giọng nói AI</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Đọc thông báo mỗi km</div>
-      </div>
-      <div class="toggle-switch active" id="voiceToggle" onclick="toggleVoice()"></div>
-    </div>
-    <div class="setting-item">
-      <div>
-        <div style="font-weight: 800;">Cân nặng (kg)</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Để tính Calo chuẩn xác hơn</div>
-      </div>
-      <input type="number" id="weightInput" value="65" style="width: 60px; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px; border-radius: 8px; text-align: center; font-weight: bold;">
-    </div>
-  </div>
-</div>
+            <div class="nav-group">
+                <div class="nav-title">MICS <span class="sub">TÍNH NĂNG PRO PLAY</span></div>
+                <button class="nav-btn">TỰ ĐỘNG SKILL</button>
+                <button class="nav-btn">AIMBOT SKILL</button>
+            </div>
 
-<!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav">
-  <div class="nav-item active" onclick="switchTab('record', this)">
-    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-    Chạy
-  </div>
-  <div class="nav-item" onclick="switchTab('history', this)">
-    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-    Lịch sử
-  </div>
-  <div class="nav-item" onclick="switchTab('profile', this)">
-    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-    Cài đặt
-  </div>
-</div>
-
-<!-- COUNTDOWN -->
-<div class="countdown-overlay" id="countdown">3</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-// ==========================================
-// HỆ THỐNG TRẠNG THÁI & BIẾN TOÀN CỤC
-// ==========================================
-let state = {
-  isRunning: false,
-  distance: 0,
-  startTime: 0,
-  path: [],
-  weight: 65,
-  voiceEnabled: true,
-  lastSpokenKm: 0
-};
-
-let watchId = null, timerId = null, wakeLock = null;
-let currentMarker = null;
-
-// ==========================================
-// UI CONTROLLERS (TABS & MODALS)
-// ==========================================
-function switchTab(tabId, el) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`view-${tabId}`).classList.add('active');
-  el.classList.add('active');
-  if(tabId === 'history') loadHistory();
-  if(tabId === 'record') map.invalidateSize(); // Sửa lỗi Leaflet khi đổi tab
-}
-
-function toggleVoice() {
-  state.voiceEnabled = !state.voiceEnabled;
-  document.getElementById('voiceToggle').classList.toggle('active');
-}
-
-document.getElementById('weightInput').addEventListener('change', (e) => {
-  state.weight = parseInt(e.target.value) || 65;
-});
-
-// ==========================================
-// MAP & LEAFLET SETUP (Dark Mode map)
-// ==========================================
-const map = L.map("map", { zoomControl: false, dragging: true }).setView([10.762, 106.660], 16);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
-
-const pathLine = L.polyline([], { color: "#c084fc", weight: 7, opacity: 0.8, lineCap: 'round' }).addTo(map);
-
-navigator.geolocation.getCurrentPosition(
-  pos => {
-    const latlng = [pos.coords.latitude, pos.coords.longitude];
-    map.setView(latlng, 17);
-    currentMarker = L.circleMarker(latlng, { radius: 8, fillColor: "#2dd4bf", color: "#fff", weight: 3, opacity: 1, fillOpacity: 1 }).addTo(map);
-  },
-  err => console.log("Waiting GPS")
-);
-
-// ==========================================
-// WAKE LOCK & TEXT-TO-SPEECH
-// ==========================================
-async function keepScreenAwake() {
-  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
-}
-
-function speakAI(text) {
-  if (!state.voiceEnabled || !('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'vi-VN';
-  utterance.rate = 1.1;
-  window.speechSynthesis.speak(utterance);
-}
-
-// ==========================================
-// CORE LOGIC: START / STOP / HOLD
-// ==========================================
-const btn = document.getElementById('runBtn');
-const ring = document.getElementById('ringFill');
-const ringCircumference = 2 * Math.PI * 50; // r=50
-ring.style.strokeDasharray = ringCircumference;
-ring.style.strokeDashoffset = ringCircumference;
-
-let holdTimer, holdProgress = 0, isHolding = false;
-
-// Xử lý logic nút Bắt đầu (Bấm) & Dừng (Nhấn giữ)
-btn.addEventListener('pointerdown', (e) => {
-  if (!state.isRunning) {
-    startCountdown();
-  } else {
-    isHolding = true;
-    holdProgress = 0;
-    holdTimer = setInterval(() => {
-      holdProgress += 2.5; // Đầy trong khoảng 1.5s
-      const offset = ringCircumference - (holdProgress / 100) * ringCircumference;
-      ring.style.strokeDashoffset = offset;
-      if (holdProgress >= 100) {
-        clearInterval(holdTimer);
-        stopRun();
-      }
-    }, 30);
-  }
-});
-
-btn.addEventListener('pointerup', cancelHold);
-btn.addEventListener('pointerleave', cancelHold);
-
-function cancelHold() {
-  if(isHolding && state.isRunning) {
-    clearInterval(holdTimer);
-    isHolding = false;
-    holdProgress = 0;
-    ring.style.strokeDashoffset = ringCircumference; // Trả lại vòng tròn
-  }
-}
-
-function startCountdown() {
-  const cdEl = document.getElementById('countdown');
-  cdEl.classList.add('show');
-  let count = 3;
-  cdEl.innerText = count;
-  speakAI("Chuẩn bị");
-  
-  let i = setInterval(() => {
-    count--;
-    if (count > 0) {
-      cdEl.innerText = count;
-    } else {
-      clearInterval(i);
-      cdEl.innerText = "GO!";
-      speakAI("Bắt đầu chạy");
-      setTimeout(() => { cdEl.classList.remove('show'); executeStart(); }, 800);
-    }
-  }, 1000);
-}
-
-function executeStart() {
-  state.isRunning = true;
-  state.distance = 0;
-  state.path = [];
-  state.lastSpokenKm = 0;
-  state.startTime = Date.now();
-  
-  document.body.classList.add("running");
-  document.getElementById('btnText').innerText = "DỪNG";
-  document.getElementById('btnHint').innerText = "Nhấn giữ";
-  document.getElementById('status-text').innerText = "Đang ghi hình GPS...";
-  
-  pathLine.setLatLngs([]);
-  keepScreenAwake();
-  
-  timerId = setInterval(updateDashboard, 1000);
-  
-  watchId = navigator.geolocation.watchPosition(
-    processGPS, 
-    err => console.warn(err),
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-  );
-}
-
-function stopRun() {
-  state.isRunning = false;
-  document.body.classList.remove("running");
-  
-  document.getElementById('btnText').innerText = "BẮT ĐẦU";
-  document.getElementById('btnHint').innerText = "Chạm";
-  document.getElementById('status-text').innerText = "Đã hoàn thành";
-  
-  ring.style.strokeDashoffset = ringCircumference; // Reset vòng tròn
-  
-  navigator.geolocation.clearWatch(watchId);
-  clearInterval(timerId);
-  if(wakeLock) wakeLock.release();
-
-  speakAI("Đã kết thúc cuốc chạy. Chúc mừng bạn.");
-  saveRunToHistory();
-}
-
-// ==========================================
-// GPS & CALCULATIONS
-// ==========================================
-function processGPS(position) {
-  const p = { lat: position.coords.latitude, lng: position.coords.longitude, acc: position.coords.accuracy };
-  
-  // Lọc nhiễu: Bỏ qua các điểm có độ chính xác quá kém (>20m)
-  if (p.acc > 20) return;
-
-  if (currentMarker) currentMarker.setLatLng([p.lat, p.lng]);
-  map.panTo([p.lat, p.lng], {animate: true});
-
-  if (state.path.length > 0) {
-    const lastP = state.path[state.path.length - 1];
-    const d = getDistance(lastP, p);
-    
-    // Thuật toán mượt (Smooth): Bỏ qua điểm cách quá xa trong t/g ngắn (tránh nhảy GPS)
-    if (d > 0.002 && d < 0.1) { 
-      state.distance += d;
-      state.path.push(p);
-      pathLine.addLatLng(p);
-      
-      // Voice feedback mỗi 1 km
-      const currentKm = Math.floor(state.distance);
-      if(currentKm > state.lastSpokenKm) {
-        state.lastSpokenKm = currentKm;
-        const paceStr = document.getElementById('pace').innerText;
-        speakAI(`Bạn đã chạy được ${currentKm} ki lô mét. Pace trung bình: ${paceStr.replace("'", " phút ").replace('"', " giây")}`);
-      }
-    }
-  } else {
-    state.path.push(p);
-    pathLine.addLatLng(p);
-  }
-}
-
-function updateDashboard() {
-  const elapsedSec = Math.floor((Date.now() - state.startTime) / 1000);
-  
-  // Format Time
-  const h = Math.floor(elapsedSec / 3600);
-  const m = String(Math.floor((elapsedSec % 3600) / 60)).padStart(2, '0');
-  const s = String(elapsedSec % 60).padStart(2, '0');
-  document.getElementById('time').innerText = h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`;
-  
-  // Update Distance UI (lấy 2 số thập phân)
-  const distStr = state.distance.toFixed(2);
-  document.getElementById('distance').innerHTML = `${distStr}<span>km</span>`;
-
-  // Calculate Pace & Calo
-  if (state.distance > 0.05) {
-    const paceVal = (elapsedSec / 60) / state.distance;
-    if (paceVal < 40) {
-      const pm = Math.floor(paceVal);
-      const ps = String(Math.floor((paceVal - pm) * 60)).padStart(2, '0');
-      document.getElementById('pace').innerText = `${pm}'${ps}"`;
-      
-      // Công thức Calo: Cân nặng(kg) * Quãng đường(km) * 1.036
-      const calo = Math.round(state.weight * state.distance * 1.036);
-      document.getElementById('calo').innerText = calo;
-    }
-  }
-}
-
-// Haversine formula (Trực tiếp bằng Math)
-function getDistance(a, b) {
-  const R = 6371, dLat = (b.lat-a.lat)*Math.PI/180, dLng = (b.lng-a.lng)*Math.PI/180;
-  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1-h));
-}
-
-// ==========================================
-// LOCAL STORAGE (LỊCH SỬ CHẠY)
-// ==========================================
-function saveRunToHistory() {
-  if(state.distance < 0.1) return; // Quá ngắn, không lưu
-  
-  const runData = {
-    date: new Date().toLocaleString('vi-VN'),
-    dist: state.distance.toFixed(2),
-    time: document.getElementById('time').innerText,
-    pace: document.getElementById('pace').innerText,
-    calo: document.getElementById('calo').innerText
-  };
-  
-  let history = JSON.parse(localStorage.getItem('runHistory') || '[]');
-  history.unshift(runData); // Thêm lên đầu
-  localStorage.setItem('runHistory', JSON.stringify(history));
-}
-
-function loadHistory() {
-  const container = document.getElementById('history-container');
-  let history = JSON.parse(localStorage.getItem('runHistory') || '[]');
-  
-  if(history.length === 0) {
-    container.innerHTML = `<div class="empty-state">Chưa có cuốc chạy nào. Hãy xỏ giày vào!</div>`;
-    return;
-  }
-  
-  container.innerHTML = history.map(run => `
-    <div class="history-card">
-      <div>
-        <div class="h-date">${run.date}</div>
-        <div class="h-dist">${run.dist} <span style="font-size:14px;color:var(--text-muted)">km</span></div>
-        <div class="h-stats">
-          <span>⏱ ${run.time}</span>
-          <span>⚡ ${run.pace}</span>
-          <span>🔥 ${run.calo} kcal</span>
+            <div class="nav-group">
+                <div class="nav-title">TOOLS <span class="sub">CUSTOM GAME</span></div>
+                <button class="nav-btn">MOD</button>
+                <div class="nav-row" style="margin-top: 8px;">
+                    <button class="nav-btn">TOOLS</button>
+                    <button class="nav-btn">MORE</button>
+                </div>
+            </div>
         </div>
-      </div>
-      <!-- SVG Icon Huy chương nếu chạy trên 5km -->
-      ${run.dist >= 5 ? `<svg width="32" height="32" viewBox="0 0 24 24" fill="var(--primary)"><path d="M12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28z"/></svg>` : ''}
+
+        <div class="main-content">
+            <h2 class="page-title">CHỨC NĂNG CHÍNH</h2>
+
+            <div class="section green">
+                <div class="section-title">TRUNG TÂM</div>
+                <div class="control-row">
+                    <div class="checkbox-item checked">
+                        <div class="check-icon">✓</div>
+                        <div class="check-info">
+                            <span class="check-title">MAP HACK</span>
+                            <span class="check-desc">Hiển Thị Tầm Nhìn</span>
+                        </div>
+                    </div>
+                    <div class="checkbox-item checked">
+                        <div class="check-icon">✓</div>
+                        <div class="check-info">
+                            <span class="check-title">TIME HỒI ULTI</span>
+                            <span class="check-desc">Hiển Thị Thời Gian Hồi</span>
+                        </div>
+                    </div>
+                    <div class="banner">
+                        UNLOCK FULL SKIN
+                        <span class="banner-sub">NHẤN GIỮ ĐỂ XEM THÊM TUỲ CHỌN</span>
+                    </div>
+                </div>
+                <div class="dropdown-wrapper">
+                    <select class="dropdown">
+                        <option>Tên Mặc Định | Tắt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section orange">
+                <div class="section-title">CHẾ ĐỘ CHƠI !</div>
+                <div class="dropdown-wrapper">
+                    <select class="dropdown">
+                        <option>CHƠI KÍN KHÔNG LỘ LIỄU</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section blue">
+                <div class="section-title">ĐIỀU CHỈNH CAMERA</div>
+                <div class="camera-controls">
+                    <div class="toggle-switch">
+                        <div class="toggle-circle"></div>
+                    </div>
+                    <div class="camera-text">
+                        <span>CAMERA<br>THẲNG</span>
+                        <span class="camera-val">1.0</span>
+                    </div>
+                    <button class="btn-action">KHOÁ CAM</button>
+                </div>
+            </div>
+
+        </div>
     </div>
-  `).join('');
-}
-</script>
+
 </body>
 </html>
