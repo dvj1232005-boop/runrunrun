@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DangTung Mod Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* Reset & Font */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, Helvetica, sans-serif; /* Font cơ bản, cứng cáp giống game */
+            font-family: 'Be Vietnam Pro', sans-serif; /* Áp dụng font mới */
             user-select: none;
         }
 
         body {
-            background-color: #000; /* Nền đen giả lập game */
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,7 +26,7 @@
             overflow: hidden;
         }
 
-        /* Ảnh Avatar Của Bạn (Góc trên bên phải giống màn hình game) */
+        /* Ảnh Avatar Của Bạn */
         .my-avatar {
             position: absolute;
             top: 20px;
@@ -42,7 +43,7 @@
         .menu-container {
             width: 800px;
             height: 460px;
-            background-color: #1a1a1c; /* Màu xám đen nhám chuẩn mẫu */
+            background-color: #1a1a1c;
             border-radius: 20px;
             display: flex;
             position: relative;
@@ -64,8 +65,8 @@
             justify-content: center;
             align-items: center;
             color: #ff4d4d;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 800;
             cursor: pointer;
             z-index: 20;
         }
@@ -89,50 +90,52 @@
             border-radius: 10px;
             padding: 6px 10px;
             font-size: 20px;
-            font-weight: 900;
+            font-weight: 800;
             margin-right: 10px;
             color: #fff;
         }
-        .brand { display: flex; flex-direction: column; }
+        .brand { display: flex; flex-direction: column; justify-content: center;}
         .brand-title { 
             font-size: 16px; 
             font-weight: 900; 
-            line-height: 1.1;
+            line-height: 1.2;
             letter-spacing: 0.5px;
         }
         .brand-sub { 
             font-size: 8px; 
             color: #8e8e93; 
             margin-top: 2px;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         /* Các mục Menu bên trái */
         .nav-group { margin-bottom: 12px; }
         .nav-title {
             font-size: 10px;
-            font-weight: 900;
+            font-weight: 800;
             color: #fff;
             margin-bottom: 8px;
             display: flex;
             gap: 5px;
+            text-transform: uppercase;
         }
-        .nav-title span { color: #8e8e93; font-weight: bold; }
+        .nav-title span { color: #8e8e93; font-weight: 600; }
         
         .nav-btn {
-            background-color: #2c2c2e; /* Màu xám của nút chưa chọn */
+            background-color: #2c2c2e;
             color: #8e8e93;
             border: none;
             padding: 12px 0;
             border-radius: 10px;
-            font-size: 12px;
-            font-weight: 900;
+            font-size: 11px;
+            font-weight: 800;
             width: 100%;
             cursor: pointer;
             margin-bottom: 6px;
+            letter-spacing: 0.2px;
         }
         .nav-btn.active {
-            background-color: #007bff; /* Màu xanh nút đang chọn */
+            background-color: #007bff;
             color: #fff;
         }
         .nav-row { display: flex; gap: 6px; }
@@ -147,10 +150,11 @@
 
         .page-title {
             text-align: center;
-            font-size: 20px;
-            font-weight: 900;
+            font-size: 18px;
+            font-weight: 800;
             margin-bottom: 20px;
             color: #fff;
+            letter-spacing: 0.5px;
         }
 
         /* Khung có viền cắt ngang chữ (Fieldset chuẩn) */
@@ -160,10 +164,11 @@
             margin-bottom: 15px;
         }
         legend {
-            font-size: 13px;
-            font-weight: 900;
+            font-size: 12px;
+            font-weight: 800;
             padding: 0 10px;
             margin-left: 10px;
+            letter-spacing: 0.5px;
         }
         
         /* Màu viền */
@@ -211,8 +216,8 @@
             color: #fff;
         }
         .check-text { display: flex; flex-direction: column; }
-        .check-title { font-size: 12px; font-weight: 900; color: #fff; }
-        .check-sub { font-size: 9px; color: #8e8e93; margin-top: 2px; }
+        .check-title { font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 0.2px;}
+        .check-sub { font-size: 9px; color: #8e8e93; margin-top: 3px; font-weight: 500;}
 
         /* Khung Banner Skin */
         .skin-banner {
@@ -227,8 +232,8 @@
             padding: 5px;
             cursor: pointer;
         }
-        .skin-banner strong { font-size: 13px; font-weight: 900; }
-        .skin-banner span { font-size: 7px; margin-top: 3px; }
+        .skin-banner strong { font-size: 12px; font-weight: 800; }
+        .skin-banner span { font-size: 7px; margin-top: 4px; font-weight: 600;}
 
         /* Dropdown (Khung chọn) */
         .select-wrapper { position: relative; width: 100%; }
@@ -240,7 +245,7 @@
             padding: 12px 15px;
             border-radius: 10px;
             font-size: 12px;
-            font-weight: 900;
+            font-weight: 700;
             appearance: none;
             outline: none;
             cursor: pointer;
@@ -283,14 +288,16 @@
         .cam-text {
             font-size: 10px;
             color: #8e8e93;
-            font-weight: 900;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-transform: uppercase;
         }
         .cam-num {
             font-size: 24px;
             color: #fff;
+            font-weight: 800;
         }
         .btn-khoacam {
             background-color: #2c2c2e;
@@ -298,9 +305,10 @@
             border: none;
             padding: 10px 20px;
             border-radius: 10px;
-            font-size: 12px;
-            font-weight: 900;
+            font-size: 11px;
+            font-weight: 800;
             cursor: pointer;
+            letter-spacing: 0.2px;
         }
     </style>
 </head>
